@@ -1,17 +1,24 @@
 {
     "version": 2,
-    "regions": [
-        "fra1"
-    ],
     "functions": {
-        "api/index.php": {
-            "runtime": "vercel-php@0.7.1"
-        }
+        "api/*.php": { "runtime": "vercel-php@0.6.2" }
     },
     "routes": [
         {
+            "src": "/css/(.*)",
+            "dest": "/public/css/"
+        },
+        {
+            "src": "/images/(.*)",
+            "dest": "/public/images/"
+        },
+        {
+            "src": "/js/(.*)",
+            "dest": "/public/js/"
+        },
+        {
             "src": "/build/(.*)",
-            "dest": "/build/$1"
+            "dest": "/public/build/"
         },
         {
             "src": "/(.*)",
@@ -23,22 +30,25 @@
         "APP_ENV": "production",
         "APP_DEBUG": "true",
         "APP_URL": "https://bondify-api.vercel.app/",
-        "APP_KEY": "base64:gjWTz8xXI0dgTMK+0Xq30sB9hRS07Gdqshuvv5/TvsM=",
+        "APP_KEY": "base64:ydzp2XIqElVtZsoY/QNo3I8WD+Aeinxd5XZpF4LUoFo=",
+
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
         "APP_ROUTES_CACHE": "/tmp/routes.php",
         "APP_SERVICES_CACHE": "/tmp/services.php",
         "VIEW_COMPILED_PATH": "/tmp",
+
         "DB_CONNECTION": "mysql",
         "DB_HOST": "wyq84.h.filess.io",
         "DB_PORT": "3305",
         "DB_DATABASE": "bondify_thendeeply",
         "DB_USERNAME": "bondify_thendeeply",
         "DB_PASSWORD": "0507e7c7316118b1f2fa39c6745eb2ad680854c4",
+
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"
-    },
-    "outputDirectory": "public"
+ 
+    }
 }
