@@ -57,4 +57,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function rooms(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Room::class, 'room_user');
+    }
 }

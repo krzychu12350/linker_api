@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SignalingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -26,6 +30,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/matches', [MatchController::class, 'index']);
     Route::get('/matches/{id}', [MatchController::class, 'show']);
     Route::post('/users/{id}/report', [MatchController::class, 'report']);
+
+
+
 });
+Route::post('/send-signal', [ChatController::class, 'initiateCall'])->name(
+    'send-signal'
+);
+Route::get('/create-room', [ChatController::class, 'createRoom']);
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
+
+Route::post('/signal', [SignalingController::class, 'signal']);
+
+Route::post('/send-message', [MessageController::class, 'sendMessage']);
+
+Route::post('chat', [ChatController::class, 'sendMessage']);
+Route::get('chat', [ChatController::class, 'getMessages']);
+
+Route::post('/notifications', [NotificationController::class, 'triggerNotification']);
+
