@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,25 +25,33 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
-    
+
+        $user->assignRole(UserRole::USER->value);
+
         return response()->json(['user' => $user], 201);
     }
     
 
     public function login(Request $request)
     {
+        // Validate the login request
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
-    
-        if (!Auth::attempt($credentials)) {
+
+        // Manually check the user's credentials using the User model
+        $user = User::where('email', $credentials['email'])->first();
+
+        // Check if the user exists and the password is correct
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-    
-        $user = Auth::user();
+
+        // Create a token for the authenticated user
         $token = $user->createToken('auth_token')->plainTextToken;
-    
+
+        // Return the user data along with the token
         return response()->json([
             'user' => [
                 'id' => $user->id,

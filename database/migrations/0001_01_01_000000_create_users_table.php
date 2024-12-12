@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,9 +19,26 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // Using enum values for the role column
+//            $table->enum('role', UserRole::values())->default(UserRole::USER->value);
+
+            $table->boolean('is_banned')->default(false);
+            $table->string('city')->nullable();
+            $table->string('profession')->nullable();
             $table->text('bio')->nullable();
-            $table->json('interests')->nullable();
-            $table->json('preferences')->nullable();
+            $table->integer('weight')->nullable();
+            $table->integer('height')->nullable();
+            $table->integer('age')->nullable();
+            //do wyrzucenia
+
+
+//            $table->text('bio')->nullable();
+//            $table->json('interests')->nullable();
+//            $table->json('preferences')->nullable();
+            //do wyrzucenia koniec
+
+
             $table->rememberToken();
             $table->timestamps();
         });
