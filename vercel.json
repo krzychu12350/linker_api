@@ -48,7 +48,11 @@
 
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
-        "SESSION_DRIVER": "cookie"
- 
+        "SESSION_DRIVER": "cookie",
+
+        "CLOUDINARY_CLOUD_NAME": "dysdefjin",
+        "CLOUDINARY_API_KEY": "388545225291945",
+        "CLOUDINARY_API_SECRET": "ZMVVwenZXy4sYR6qdUo-k5w23hY",
+        "PHOTO_STORAGE": "cloudinary"
     }
 }
