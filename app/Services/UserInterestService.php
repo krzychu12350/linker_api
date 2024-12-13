@@ -9,25 +9,27 @@ class UserInterestService
 {
     private function fetchDetails(): \Illuminate\Support\Collection
     {
-        // Fetch all the details (groups, subgroups, and options)
-        return Detail::with('children') // Load child details (subgroups) relationships
+        // Fetch all the details (groups, subgroups, and options) with their children in a single query
+        return Detail::with('children.children') // Eager load subgroups and options
         ->whereNull('parent_id') // Only get top-level groups (no parent)
         ->get();
     }
 
     private function mapDetails($details, array $selectedDetailsIds = [], bool $includeSelection = true): array
     {
-        return $details->map(function ($group) use ($selectedDetailsIds, $includeSelection) {
+        $selectedDetailsSet = collect($selectedDetailsIds); // Create a set for faster lookup
+
+        return $details->map(function ($group) use ($selectedDetailsSet, $includeSelection) {
             // Fetch the subgroups (child groups) for this group
-            $subGroups = $group->children->map(function ($subGroup) use ($group, $selectedDetailsIds, $includeSelection) {
+            $subGroups = $group->children->map(function ($subGroup) use ($group, $selectedDetailsSet, $includeSelection) {
                 // Check if this subgroup has its own subgroups (options)
-                $subGroupOptions = $subGroup->children->map(function ($option) use ($selectedDetailsIds, $includeSelection) {
+                $subGroupOptions = $subGroup->children->map(function ($option) use ($selectedDetailsSet, $includeSelection) {
                     $optionData = [
                         'id' => $option->id, // Option ID
                         'name' => $option->name, // Option name
                     ];
                     if ($includeSelection) {
-                        $optionData['is_selected'] = in_array($option->id, $selectedDetailsIds); // Check if selected
+                        $optionData['is_selected'] = $selectedDetailsSet->contains($option->id); // Use contains for faster lookup
                     }
                     return $optionData;
                 });
@@ -37,7 +39,7 @@ class UserInterestService
                     $subGroupOptions = collect([[
                         'id' => $group->id, // Return the main group ID as an option
                         'name' => $group->name, // Main group name as option
-                        'is_selected' => $includeSelection ? in_array($group->id, $selectedDetailsIds) : null, // Add is_selected if required
+                        'is_selected' => $includeSelection ? $selectedDetailsSet->contains($group->id) : null, // Add is_selected if required
                     ]]);
                 }
 
@@ -51,13 +53,13 @@ class UserInterestService
             // For groups like "Gender", only return options without subgroups
             if ($group->children->isNotEmpty() && $group->children->first()->children->isEmpty()) {
                 // Return the group with its options (without subgroups)
-                $options = $group->children->map(function ($option) use ($selectedDetailsIds, $includeSelection) {
+                $options = $group->children->map(function ($option) use ($selectedDetailsSet, $includeSelection) {
                     $optionData = [
                         'id' => $option->id, // Option ID
                         'name' => $option->name, // Option name
                     ];
                     if ($includeSelection) {
-                        $optionData['is_selected'] = in_array($option->id, $selectedDetailsIds); // Check if selected
+                        $optionData['is_selected'] = $selectedDetailsSet->contains($option->id); // Check if selected
                     }
                     return $optionData;
                 });
@@ -78,7 +80,6 @@ class UserInterestService
         })->toArray();
     }
 
-
     public function getAllUserDetails(): array
     {
         $details = $this->fetchDetails();
@@ -87,11 +88,20 @@ class UserInterestService
 
     public function getAllUserDetailsWithSelection(User $user): array
     {
-        $selectedDetailsIds = $user->details()->get()->pluck('id')->toArray();
-        $details = $this->fetchDetails();
-        return $this->mapDetails($details, $selectedDetailsIds);
-    }
+        $userDetails = $user
+            ->details()
+            ->get();
 
+//        if($userDetails->isEmpty()) {
+//            return [];
+//        }
+
+        $selectedDetailsIds = $userDetails
+            ->pluck('id')
+            ->toArray(); // Use pluck() to fetch only IDs
+
+        return $this->mapDetails($this->fetchDetails(), $selectedDetailsIds);
+    }
 
     /**
      * Update the user details with the provided group and sub-group IDs.
@@ -110,15 +120,22 @@ class UserInterestService
 
         $detailsToUpdate = [];
 
+        // Collect all the sub-group details first for better performance
+        $subGroups = Detail::whereIn('id', array_column($validatedData['details'], 'sub_group_id'))
+            ->get()->keyBy('id');
+
+        $groupDetails = Detail::whereIn('id', array_column($validatedData['details'], 'group_id'))
+            ->get()->keyBy('id');
+
         // Loop through the provided details
         foreach ($validatedData['details'] as $detailData) {
             $subGroupDetail = $detailData['sub_group_id'] ?? null;
 
             // Check for valid sub-group detail if exists
-            if ($subGroupDetail && $subGroup = Detail::find($subGroupDetail)) {
-                $groupDetail = Detail::find($detailData['group_id'] ?? null);
+            if ($subGroupDetail && isset($subGroups[$subGroupDetail])) {
+                $groupDetail = $groupDetails[$detailData['group_id']] ?? null;
 
-                if ($groupDetail && $subGroup->parent_id == $groupDetail->id) {
+                if ($groupDetail && $subGroups[$subGroupDetail]->parent_id == $groupDetail->id) {
                     $detailsToUpdate[] = $detailData['options'];
                 }
             } else {
@@ -134,6 +151,4 @@ class UserInterestService
 
         return true;
     }
-
-
 }

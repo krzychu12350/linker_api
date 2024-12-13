@@ -108,81 +108,92 @@ class User extends Authenticatable
         return $this->belongsToMany(File::class, 'file_user', 'user_id', 'file_id');
     }
 
-    private function fetchDetails(): \Illuminate\Support\Collection
+    /**
+     * Fetch all the details (groups, subgroups, and options) with eager loading.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function fetchDetails()
     {
-        // Fetch all the details (groups, subgroups, and options)
-        return Detail::with('children') // Load child details (subgroups) relationships
-        ->whereNull('parent_id') // Only get top-level groups (no parent)
+        // Eager load subgroups and options in a single query to prevent N+1
+        return Detail::with('children.children')  // Eager load children (subgroups) and children of children (options)
+        ->whereNull('parent_id')  // Only get top-level groups (no parent)
         ->get();
     }
 
+    /**
+     * Map the details into a specific structure while optimizing selection checks.
+     *
+     * @param \Illuminate\Support\Collection $details
+     * @param array $selectedDetailsIds
+     * @param bool $includeSelection
+     * @return array
+     */
     private function mapDetails($details, array $selectedDetailsIds = [], bool $includeSelection = true): array
     {
-        return $details->map(function ($group) use ($selectedDetailsIds, $includeSelection) {
-            // Fetch the subgroups (child groups) for this group
-            $subGroups = $group->children->map(function ($subGroup) use ($group, $selectedDetailsIds, $includeSelection) {
+        $selectedDetailsSet = collect($selectedDetailsIds); // Use a collection for faster contains lookup
+
+        return $details->map(function ($group) use ($selectedDetailsSet, $includeSelection) {
+            $subGroups = $group->children->map(function ($subGroup) use ($group, $selectedDetailsSet, $includeSelection) {
                 // Check if this subgroup has its own subgroups (options)
-                $subGroupOptions = $subGroup->children->map(function ($option) use ($selectedDetailsIds, $includeSelection) {
-                    $optionData = [
-                        'id' => $option->id, // Option ID
-                        'name' => $option->name, // Option name
+                $subGroupOptions = $subGroup->children->map(function ($option) use ($selectedDetailsSet, $includeSelection) {
+                    return [
+                        'id' => $option->id,
+                        'name' => $option->name,
+                        'is_selected' => $includeSelection ? $selectedDetailsSet->contains($option->id) : null,
                     ];
-                    if ($includeSelection) {
-                        $optionData['is_selected'] = in_array($option->id, $selectedDetailsIds); // Check if selected
-                    }
-                    return $optionData;
                 });
 
                 // If there are no subgroups (options) for this subgroup, return main group options
                 if ($subGroupOptions->isEmpty()) {
                     $subGroupOptions = collect([[
-                        'id' => $group->id, // Return the main group ID as an option
-                        'name' => $group->name, // Main group name as option
-                        'is_selected' => $includeSelection ? in_array($group->id, $selectedDetailsIds) : null, // Add is_selected if required
+                        'id' => $group->id,
+                        'name' => $group->name,
+                        'is_selected' => $includeSelection ? $selectedDetailsSet->contains($group->id) : null,
                     ]]);
                 }
 
                 return [
-                    'id' => $subGroup->id, // Add subgroup ID
+                    'id' => $subGroup->id,
                     'name' => $subGroup->name,
                     'options' => $subGroupOptions->toArray(),
                 ];
             });
 
-            // For groups like "Gender", only return options without subgroups
+            // For groups like "Gender", return options without subgroups
             if ($group->children->isNotEmpty() && $group->children->first()->children->isEmpty()) {
-                // Return the group with its options (without subgroups)
-                $options = $group->children->map(function ($option) use ($selectedDetailsIds, $includeSelection) {
-                    $optionData = [
-                        'id' => $option->id, // Option ID
-                        'name' => $option->name, // Option name
-                    ];
-                    if ($includeSelection) {
-                        $optionData['is_selected'] = in_array($option->id, $selectedDetailsIds); // Check if selected
-                    }
-                    return $optionData;
-                });
-
                 return [
-                    'id' => $group->id, // Add group ID
+                    'id' => $group->id,
                     'group' => $group->name,
-                    'options' => $options->toArray(), // Return as an array of options
+                    'options' => $group->children->map(function ($option) use ($selectedDetailsSet, $includeSelection) {
+                        return [
+                            'id' => $option->id,
+                            'name' => $option->name,
+                            'is_selected' => $includeSelection ? $selectedDetailsSet->contains($option->id) : null,
+                        ];
+                    })->toArray(),
                 ];
             }
 
-            // If there are subgroups, return the full structure with subgroups
             return [
-                'id' => $group->id, // Add group ID
+                'id' => $group->id,
                 'group' => $group->name,
-                'subGroups' => $subGroups->isEmpty() ? null : $subGroups->toArray(), // Return subgroups if they exist
+                'subGroups' => $subGroups->isEmpty() ? null : $subGroups->toArray(),
             ];
         })->toArray();
     }
 
-
+    /**
+     * Fetch all selected details and map them.
+     *
+     * @return array
+     */
     public function allSelectedDetails(): array
     {
-        $selectedDetailsIds = $this->details()->get()->pluck('id')->toArray();
+        // Fetch selected details for the user efficiently
+        $selectedDetailsIds = $this->details()->pluck('id')->toArray(); // Use pluck for faster retrieval of IDs
+
+        // Fetch the details and map them
         $details = $this->fetchDetails();
         return $this->mapDetails($details, $selectedDetailsIds);
     }
