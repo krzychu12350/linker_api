@@ -53,6 +53,7 @@
         "CLOUDINARY_CLOUD_NAME": "dysdefjin",
         "CLOUDINARY_API_KEY": "388545225291945",
         "CLOUDINARY_API_SECRET": "ZMVVwenZXy4sYR6qdUo-k5w23hY",
-        "PHOTO_STORAGE": "cloudinary"
+        "PHOTO_STORAGE": "cloudinary",
+        "CLOUDINARY_URL": "cloudinary://388545225291945:ZMVVwenZXy4sYR6qdUo-k5w23hY@dysdefjin"
     }
 }
