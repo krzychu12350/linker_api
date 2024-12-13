@@ -1,113 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Services;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
+use App\Models\Detail;
+use App\Models\User;
 
-class User extends Authenticatable
+class UserInterestService
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, HasRoles;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'password',
-        'email_verified_at',
-        'role',
-        'is_banned',
-        'city',
-        'profession',
-        'bio',
-        'weight',
-        'height',
-        'age'
-    ];
-
-    protected $casts = [
-//        'interests' => 'array',
-//        'preferences' => 'array',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-
-    // Define the relationship to the images table (Many-to-Many)
-    public function photos()
-    {
-        return $this->belongsToMany(File::class, 'file_user', 'user_id', 'file_id');
-    }
-
-    // Define the relationship with Detail model via the detail_user pivot table
-    public function details()
-    {
-        return $this->belongsToMany(Detail::class, 'detail_user', 'user_id', 'detail_id');
-    }
-
-    /**
-     * Get all conversations that the user is part of.
-     */
-    public function conversations()
-    {
-        return $this->belongsToMany(Conversation::class, 'conversation_user')
-            ->withTimestamps();
-    }
-
-    /**
-     * Get all messages sent by the user.
-     */
-    public function sentMessages()
-    {
-        return $this->hasMany(Message::class, 'sender_id');
-    }
-
-    /**
-     * Get all messages received by the user.
-     */
-    public function receivedMessages()
-    {
-        return $this->hasMany(Message::class, 'receiver_id');
-    }
-
-    /**
-     * The files that belong to the user.
-     */
-    public function files()
-    {
-        return $this->belongsToMany(File::class, 'file_user', 'user_id', 'file_id');
-    }
-
     private function fetchDetails(): \Illuminate\Support\Collection
     {
         // Fetch all the details (groups, subgroups, and options)
@@ -180,10 +79,61 @@ class User extends Authenticatable
     }
 
 
-    public function allSelectedDetails(): array
+    public function getAllUserDetails(): array
     {
-        $selectedDetailsIds = $this->details()->get()->pluck('id')->toArray();
+        $details = $this->fetchDetails();
+        return $this->mapDetails($details, [], false);
+    }
+
+    public function getAllUserDetailsWithSelection(User $user): array
+    {
+        $selectedDetailsIds = $user->details()->get()->pluck('id')->toArray();
         $details = $this->fetchDetails();
         return $this->mapDetails($details, $selectedDetailsIds);
     }
+
+
+    /**
+     * Update the user details with the provided group and sub-group IDs.
+     *
+     * @param array $validatedData
+     * @param int $userId
+     * @return bool
+     */
+    public function updateUserDetails(array $validatedData, int $userId): bool
+    {
+        // Find the user
+        $user = User::find($userId);
+        if (!$user) {
+            return false;
+        }
+
+        $detailsToUpdate = [];
+
+        // Loop through the provided details
+        foreach ($validatedData['details'] as $detailData) {
+            $subGroupDetail = $detailData['sub_group_id'] ?? null;
+
+            // Check for valid sub-group detail if exists
+            if ($subGroupDetail && $subGroup = Detail::find($subGroupDetail)) {
+                $groupDetail = Detail::find($detailData['group_id'] ?? null);
+
+                if ($groupDetail && $subGroup->parent_id == $groupDetail->id) {
+                    $detailsToUpdate[] = $detailData['options'];
+                }
+            } else {
+                $detailsToUpdate[] = $detailData['options'];
+            }
+        }
+
+        // Flatten and merge the options
+        $mergedDetailIds = collect($detailsToUpdate)->flatten()->toArray();
+
+        // Sync the user with the selected details
+        $user->details()->sync($mergedDetailIds);
+
+        return true;
+    }
+
+
 }

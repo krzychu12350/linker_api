@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Detail\DetailController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\MatchController;
+use App\Http\Controllers\Profile\ProfileController;
+use App\Http\Controllers\User\Detail\UserDetailController;
+use App\Http\Controllers\User\Photo\UserProfilePhotoController;
+use App\Http\Controllers\User\Profile\UserProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\MatchController;
-use App\Http\Controllers\HealthCheckController;
 
 
 Route::get('/user', function (Request $request) {
@@ -20,12 +24,44 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'getProfile']); // Pobieranie danych profilu
-    Route::put('/profile', [ProfileController::class, 'update']);    // Aktualizacja profilu
+//    Route::get('/profile', [UserProfileController::class, 'getProfile']); // Pobieranie danych profilu
+//    Route::put('/profile', [UserProfileController::class, 'update']);    // Aktualizacja profilu
+
+
+    Route::apiResource('profiles', ProfileController::class)->only([
+        'index'
+    ]);
+
+    Route::prefix('/users/{user}')->group(function () {
+        Route::get('/profile', [UserProfileController::class, 'show']);
+        Route::put('/profile', [UserProfileController::class, 'update']);
+
+        Route::get('/photos', [UserProfilePhotoController::class, 'index']);
+        Route::post('/photos', [UserProfilePhotoController::class, 'update']);
+        Route::delete('/photos/{id}', [UserProfilePhotoController::class, 'destroy']);
+    });
+
 
     Route::get('/matches', [MatchController::class, 'index']);
     Route::get('/matches/{id}', [MatchController::class, 'show']);
     Route::post('/users/{id}/report', [MatchController::class, 'report']);
+
+
+    Route::apiResource('details', DetailController::class)->only([
+        'index',
+    ]);
+
+    Route::apiResource('users.details', UserDetailController::class)->only([
+        'index',
+        'store'
+    ]);
+
+
+
+
+
 });
+
+
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);

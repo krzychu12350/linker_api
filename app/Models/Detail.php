@@ -49,4 +49,12 @@ class Detail extends Model
     {
         return $this->sub_group ? $this->sub_group : $this->group;
     }
+
+    // Define the relationship for subgroups (children)
+    public function children()
+    {
+        return $this->hasMany(Detail::class, 'parent_id');
+    }
+
+
 }
