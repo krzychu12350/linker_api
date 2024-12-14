@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class PhotoResource extends JsonResource
 {
@@ -17,9 +16,8 @@ class PhotoResource extends JsonResource
     {
 
 
-        $url = Cloudinary::getUrl($this->url);
         return [
-            'url' => $url,
+            'url' => "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/" . $this->url,
         ];
     }
 }
