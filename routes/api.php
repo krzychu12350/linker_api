@@ -65,7 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
 //]);
 
 Route::apiResource('swipes', SwipeController::class)->only([
-    'index'
+    'index',
+    'store',
 ]);
 
 
