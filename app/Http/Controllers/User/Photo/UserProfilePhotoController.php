@@ -64,7 +64,7 @@ class UserProfilePhotoController extends Controller
 //            $path = $photo->store('profile_photos', 'public'); // Store the photo in the 'profile_photos' directory within 'public'
 //            $url = Storage::url($path); // Get the URL of the stored file
             $url = $this->storageStrategy->store($photo);
-
+           // dd( $url );
             // Create a new file record in the `files` table
             $file = File::create([
                 'url' => $url,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Profile;
 
+use App\Http\Resources\PhotoResource;
 use App\Http\Resources\User\Profile\UserProfileResource;
 use App\Services\UserInterestService;
 use Illuminate\Http\Request;
@@ -18,9 +19,12 @@ class ProfileResource extends JsonResource
     {
 
         return [
-            'user' => new UserProfileResource($this->resource),
-            'photos' => $this->resource->photos,
-            'details' => $this->resource->allSelectedDetails(),
+            'user' => [
+                'first_name' =>  $this->resource->first_name,
+                'age' =>  $this->resource->age,
+            ],
+            'photos' => PhotoResource::collection($this->resource->photos),
+//            'details' => $this->resource->allSelectedDetails(),
         ];
     }
 }

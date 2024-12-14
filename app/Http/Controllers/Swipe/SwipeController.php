@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Profile;
+namespace App\Http\Controllers\Swipe;
 
-use App\Enums\FileType;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Profile\ProfileResource;
 use App\Http\Resources\SwipeResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class ProfileController extends Controller
+class SwipeController extends Controller
 {
     /**
      * Display a listing of the resource.

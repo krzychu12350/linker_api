@@ -39,7 +39,9 @@ class CloudinaryStorageStrategy implements PhotoStorageStrategy
 //                'crop' => 'fill'
 //            ]
         ]);
+       // dd('dwdwdw', $data->getPublicId());
         return $data->getPublicId();
+
 
 //        dd($data);
 //        dd($uploadedFileUrl);

@@ -21,7 +21,6 @@ class LocalStorageStrategy implements PhotoStorageStrategy
     {
         // Check if the $path includes 'storage/' and remove it if it does
         $path = str_replace('storage/', '', $path);
-
         // Delete the file using the cleaned-up path
         return Storage::disk('public')->delete($path);
     }
