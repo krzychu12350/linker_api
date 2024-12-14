@@ -11,6 +11,7 @@ use App\Models\Swipe;
 use App\Models\SwipeMatch;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SwipeController extends Controller
 {
@@ -19,7 +20,9 @@ class SwipeController extends Controller
      */
     public function index()
     {
-        $users = User::with(['photos'])->get();
+        $users = User::with(['photos'])
+            ->where('id', '!=', Auth::id()) // Exclude the current authenticated user
+            ->get();
 
         return SwipeResource::collection($users);
     }
