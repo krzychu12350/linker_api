@@ -40,11 +40,11 @@
         "VIEW_COMPILED_PATH": "/tmp",
 
         "DB_CONNECTION": "mysql",
-        "DB_HOST": "wyq84.h.filess.io",
+        "DB_HOST": "b9o45.h.filess.io",
         "DB_PORT": "3305",
-        "DB_DATABASE": "bondify_thendeeply",
-        "DB_USERNAME": "bondify_thendeeply",
-        "DB_PASSWORD": "0507e7c7316118b1f2fa39c6745eb2ad680854c4",
+        "DB_DATABASE": "linker_heightsong",
+        "DB_USERNAME": "linker_heightsong",
+        "DB_PASSWORD": "608b19e8c93993ac1610f95b1a347cff662b25b9",
 
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
