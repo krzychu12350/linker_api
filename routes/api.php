@@ -55,7 +55,10 @@ Route::middleware('auth:sanctum')->group(function () {
         'store'
     ]);
 
-
+    Route::apiResource('swipes', SwipeController::class)->only([
+        'index',
+        'store',
+    ]);
 
 
 });
@@ -64,10 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
 //    'index'
 //]);
 
-Route::apiResource('swipes', SwipeController::class)->only([
-    'index',
-    'store',
-]);
+
 
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
