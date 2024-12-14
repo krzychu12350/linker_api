@@ -5,6 +5,7 @@ use App\Http\Controllers\Detail\DetailController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\Profile\ProfileController;
+use App\Http\Controllers\Swipe\SwipeController;
 use App\Http\Controllers\User\Detail\UserDetailController;
 use App\Http\Controllers\User\Photo\UserProfilePhotoController;
 use App\Http\Controllers\User\Profile\UserProfileController;
@@ -28,9 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
 //    Route::put('/profile', [UserProfileController::class, 'update']);    // Aktualizacja profilu
 
 
-    Route::apiResource('profiles', ProfileController::class)->only([
-        'index'
-    ]);
+
 
     Route::prefix('/users/{user}')->group(function () {
         Route::get('/profile', [UserProfileController::class, 'show']);
@@ -59,9 +58,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-
 });
 
+//Route::apiResource('profiles', ProfileController::class)->only([
+//    'index'
+//]);
+
+Route::apiResource('swipes', SwipeController::class)->only([
+    'index'
+]);
 
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
