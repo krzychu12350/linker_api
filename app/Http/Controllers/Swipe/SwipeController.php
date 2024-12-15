@@ -23,12 +23,28 @@ class SwipeController extends Controller
      */
     public function index()
     {
+        // Get the authenticated user
         $user = auth()->user();
-        $users = User::with(['photos', 'conversations'])
-            ->where('id', '!=', Auth::id()) // Exclude the current authenticated user
-            ->get();
 
-        return SwipeResource::collection($users);
+        // Retrieve all swipeMatches where the current user's ID is swipe_id_1 or swipe_id_2
+        $swipes = $user->swipeMatches()->get();
+
+        // Initialize an array to store matched users where swipe_id_2 matches
+        $matchedUsers = [];
+
+        // Loop through each swipeMatch
+        foreach ($swipes as $swipe) {
+            // Check if swipe_id_2 matches the authenticated user's ID
+            if ($swipe->swipe_id_1 == $user->id) {
+                // Find the user who swiped on the authenticated user (where swipe_id_1 matches)
+                $matchedUser = User::find($swipe->swipe_id_2);
+
+                // Add the matched user to the array
+                $matchedUsers[] = $matchedUser;
+            }
+        }
+        // Return matched users with the specified relationships
+        return SwipeResource::collection($matchedUsers);
     }
 
     /**
