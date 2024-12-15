@@ -16,22 +16,34 @@ class Conversation extends Model
         'match_id',
     ];
 
-    /**
-     * Get all users that belong to the conversation.
-     */
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'conversation_user')
-            ->withTimestamps();
-    }
+    // Conversation.php
 
-    /**
-     * Get all messages in the conversation.
-     */
     public function messages()
     {
         return $this->hasMany(Message::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'conversation_user');
+    }
+
+    /**
+     * Get all users that belong to the conversation.
+     */
+//    public function users()
+//    {
+//        return $this->belongsToMany(User::class, 'conversation_user')
+//            ->withTimestamps();
+//    }
+
+//    /**
+//     * Get all messages in the conversation.
+//     */
+//    public function messages()
+//    {
+//        return $this->hasMany(Message::class);
+//    }
 
     /**
      * Get the swipe match if it's a one-on-one conversation.

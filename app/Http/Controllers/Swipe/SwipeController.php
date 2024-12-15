@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Swipe;
 
+use App\Enums\ConversationType;
 use App\Enums\SwipeType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Swipe\StoreSwipeRequest;
 use App\Http\Resources\MatchUserResource;
 use App\Http\Resources\SwipeResource;
+use App\Models\Conversation;
+use App\Models\ConversationUser;
 use App\Models\Swipe;
 use App\Models\SwipeMatch;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class SwipeController extends Controller
 {
@@ -21,9 +24,8 @@ class SwipeController extends Controller
     public function index()
     {
         $user = auth()->user();
-//        dd(Auth::id());
         $users = User::with(['photos'])
-            ->where('id', '!=', Auth::id() ??  $user->id) // Exclude the current authenticated user
+            ->where('id', '!=', Auth::id()) // Exclude the current authenticated user
             ->get();
 
         return SwipeResource::collection($users);
@@ -36,15 +38,19 @@ class SwipeController extends Controller
     {
         // The validated data from the request
         $validated = $request->validated();
-//        dd($validated);
 
         // Get the authenticated user
         $user = auth()->user();
-//        dd([
-//            'user_id' => $user->id,
-//            'swiped_user_id' => $validated['swiped_user_id'],
-//            'type' => $validated['type'],
-//        ]);
+
+        // Ensure the swiped user exists
+        $swipedUser = User::find($validated['swiped_user_id']);
+        if (!$swipedUser) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The user you swiped on does not exist.'
+            ], 404);
+        }
+
         // Check if the swipe already exists
         $swipe = Swipe::firstOrCreate(
             [
@@ -59,11 +65,9 @@ class SwipeController extends Controller
         // Check if the other user has swiped back
         $hasMatch = Swipe::where('user_id', $validated['swiped_user_id'])
             ->where('swiped_user_id', $validated['user_id'])
-            ->where('type', SwipeType::RIGHT) // Assuming SwipeType has a method to get the opposite type
-            ->orWhere('type', SwipeType::UP) // Assuming SwipeType has a method to get the opposite type
+            ->whereIn('type', [SwipeType::RIGHT, SwipeType::UP]) // Check for mutual right or up swipes
             ->exists();
 
-        // If the other user has swiped back, create a match
         if ($hasMatch) {
             // Ensure that we have a unique match
             $swipeMatch = SwipeMatch::firstOrCreate([
@@ -71,22 +75,38 @@ class SwipeController extends Controller
                 'swipe_id_2' => $validated['swiped_user_id'],
             ]);
 
-//            dd('has match');
+            // Create a conversation between the two matched users
+            $conversation = Conversation::create([
+                'match_id' => $swipeMatch->id,
+                'type' => ConversationType::USER, // Assuming a PRIVATE type exists in ConversationType
+            ]);
 
+            // Add the current user to the conversation
+            ConversationUser::create([
+                'conversation_id' => $conversation->id,
+                'user_id' => $validated['user_id'],
+                'is_admin' => false, // By default, the user is not an admin
+            ]);
+
+            // Add the swiped user to the conversation
+            ConversationUser::create([
+                'conversation_id' => $conversation->id,
+                'user_id' => $validated['swiped_user_id'],
+                'is_admin' => false, // By default, the user is not an admin
+            ]);
+
+            // Return success response with matched users
             return response()->json([
                 'status' => 'success',
-                'message' => 'Match',
+                'message' => 'Match and conversation created',
                 'data' => [
                     'current_user' => new MatchUserResource(User::find($validated['user_id'])),
                     'matched_user' => new MatchUserResource(User::find($validated['swiped_user_id'])),
                 ]
             ], 201);
-            // create new conversation between these two users
-
-            // broadcast event to fronend via pusher about new match for current logged in user
-
         }
 
+        // If no match, just return a success message
         return response()->json([
             'status' => 'success',
             'message' => 'Swipe added successfully',

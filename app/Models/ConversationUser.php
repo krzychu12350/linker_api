@@ -11,5 +11,6 @@ class ConversationUser extends Model
     protected $fillable = [
         'conversation_id',
         'user_id',
+        'is_admin',
     ];
 }

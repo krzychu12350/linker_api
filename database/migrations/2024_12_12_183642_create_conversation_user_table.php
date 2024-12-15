@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::create('conversation_user', function (Blueprint $table) {
             $table->id();
-//            $table->unsignedBigInteger('conversation_id');
-//            $table->unsignedBigInteger('user_id');
             $table->timestamps();
 
             // Foreign keys
@@ -26,10 +24,6 @@ return new class extends Migration
 
             // Add is_admin column to determine if the user is an admin in the conversation
             $table->boolean('is_admin')->default(false);
-
-            // Optionally, you could add a unique constraint if a conversation can only have one admin
-            $table->unique('conversation_id', 'is_admin');
-
         });
     }
 

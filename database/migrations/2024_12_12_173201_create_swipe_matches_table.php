@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('swipe_id_1');
             $table->unsignedBigInteger('swipe_id_2');
-            $table->unique(['swipe_id_1', 'swipe_id_2']);
+            //$table->unique(['swipe_id_1', 'swipe_id_2']);
 
 //            $table->foreignId('swipe_id_1')->constrained('swipes')->cascadeOnDelete();
 //            $table->foreignId('swipe_id_2')->constrained('swipes')->cascadeOnDelete();
