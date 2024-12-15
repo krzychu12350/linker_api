@@ -17,9 +17,9 @@ class PhotoResource extends JsonResource
     {
 
 
-        $url = Cloudinary::getUrl($this->url);
+        //$url = Cloudinary::getUrl($this->url);
         return [
-            'url' => $url,
+            'url' =>   "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/". $this->url,
         ];
     }
 }

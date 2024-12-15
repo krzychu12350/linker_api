@@ -24,7 +24,7 @@ class SwipeController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $users = User::with(['photos'])
+        $users = User::with(['photos', 'conversations'])
             ->where('id', '!=', Auth::id()) // Exclude the current authenticated user
             ->get();
 
