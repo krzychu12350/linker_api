@@ -32,7 +32,7 @@ class SwipeResource extends JsonResource
         return [
             'user' => [
                 'swipe_id' => $this->resource->id,
-                'conversation_id' => $this->resource->conversations?->last()->id,
+                'conversation_id' => $this->resource->conversations?->last()?->id,
                 'first_name' => $this->resource->first_name,
                 'last_name' => $this->resource->last_name,
                 'age' => $this->resource->age,
