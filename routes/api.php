@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Conversation\ConversationController;
 use App\Http\Controllers\Detail\DetailController;
 use App\Http\Controllers\HealthCheckController;

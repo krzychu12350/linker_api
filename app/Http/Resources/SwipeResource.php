@@ -34,6 +34,7 @@ class SwipeResource extends JsonResource
                 'swipe_id' => $this->resource->id,
                 'conversation_id' => $this->resource->conversations?->last()->id,
                 'first_name' => $this->resource->first_name,
+                'last_name' => $this->resource->last_name,
                 'age' => $this->resource->age,
                 'photo' =>  $photoUrl,  // Cloudinary URL or empty string
             ],
