@@ -75,14 +75,25 @@ class User extends Authenticatable
         return $this->belongsToMany(Detail::class, 'detail_user', 'user_id', 'detail_id');
     }
 
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_user', 'user_id', 'conversation_id');
+    }
+
+    public function swipeMatches()
+    {
+        return $this->hasManyThrough(SwipeMatch::class, Swipe::class, 'user_id', 'swipe_id_1', 'id', 'id');
+    }
+
+
     /**
      * Get all conversations that the user is part of.
      */
-    public function conversations()
-    {
-        return $this->belongsToMany(Conversation::class, 'conversation_user')
-            ->withTimestamps();
-    }
+//    public function conversations()
+//    {
+//        return $this->belongsToMany(Conversation::class, 'conversation_user')
+//            ->withTimestamps();
+//    }
 
     /**
      * Get all messages sent by the user.

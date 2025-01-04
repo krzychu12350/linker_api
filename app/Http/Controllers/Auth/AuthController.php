@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -32,15 +33,16 @@ class AuthController extends Controller
     }
     
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         // Validate the login request
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+//        $credentials = $request->validate([
+//            'email' => 'required|email',
+//            'password' => 'required|string',
+//        ]);
+        $credentials = $request->validated();
 
-        // Manually check the user's credentials using the User model
+            // Manually check the user's credentials using the User model
         $user = User::where('email', $credentials['email'])->first();
 
         // Check if the user exists and the password is correct
@@ -51,6 +53,10 @@ class AuthController extends Controller
         // Create a token for the authenticated user
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $photoUrl = $user->photos->isEmpty() ? "" :
+            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
+            . $user->photos->first()->url;
+
         // Return the user data along with the token
         return response()->json([
             'user' => [
@@ -58,6 +64,7 @@ class AuthController extends Controller
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
+                'photo' =>  $photoUrl,
             ],
             'token' => $token,
         ], 200);

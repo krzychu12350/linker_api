@@ -18,4 +18,13 @@ class SwipeMatch extends Model
         'swipe_id_1',
         'swipe_id_2',
     ];
+
+    /**
+     * Get the user associated with swipe_id_1.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'swipe_id_1');
+    }
+
 }

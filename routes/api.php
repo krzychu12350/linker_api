@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Conversation\ConversationController;
 use App\Http\Controllers\Detail\DetailController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MatchController;
-use App\Http\Controllers\Profile\ProfileController;
+use App\Http\Controllers\Message\MessageController;
 use App\Http\Controllers\Swipe\SwipeController;
 use App\Http\Controllers\User\Detail\UserDetailController;
 use App\Http\Controllers\User\Photo\UserProfilePhotoController;
@@ -29,8 +30,6 @@ Route::middleware('auth:sanctum')->group(function () {
 //    Route::put('/profile', [UserProfileController::class, 'update']);    // Aktualizacja profilu
 
 
-
-
     Route::prefix('/users/{user}')->group(function () {
         Route::get('/profile', [UserProfileController::class, 'show']);
         Route::put('/profile', [UserProfileController::class, 'update']);
@@ -38,6 +37,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/photos', [UserProfilePhotoController::class, 'index']);
         Route::post('/photos', [UserProfilePhotoController::class, 'update']);
         Route::delete('/photos/{id}', [UserProfilePhotoController::class, 'destroy']);
+
+        Route::apiResource('conversations', ConversationController::class)->only([
+            'index',
+//        'store',
+        ]);
+
+        Route::prefix('/conversations/{conversation}')->group(function () {
+            Route::apiResource('messages', MessageController::class)->only([
+                'index',
+                'store',
+            ]);
+        });
+
     });
 
 
@@ -66,8 +78,6 @@ Route::middleware('auth:sanctum')->group(function () {
 //Route::apiResource('profiles', ProfileController::class)->only([
 //    'index'
 //]);
-
-
 
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);

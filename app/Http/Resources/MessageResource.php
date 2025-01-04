@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PhotoResource extends JsonResource
+class MessageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,10 @@ class PhotoResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
-
-        //$url = Cloudinary::getUrl($this->url);
         return [
-            'url' =>   "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/". $this->url,
+            'body' => $this->body,
+            'read_at' => $this->read_at,
+            'is_read' => (bool) $this->read_at,  // Assuming is_read is determined based on read_at
         ];
     }
 }
