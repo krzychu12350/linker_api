@@ -20,6 +20,7 @@ class SwipeResource extends JsonResource
 
 
         return [
+            'id' => $this->resource->id,
             'first_name' => $this->resource->first_name,
             'age' => $this->resource->age,
             'photo' => $photoUrl,  // Cloudinary URL or empty string
