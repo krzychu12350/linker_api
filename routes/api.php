@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'store',
     ]);
 
+    Route::get('/swipes/matches', [SwipeController::class, 'getMatchedSwipes']);
 
 });
 

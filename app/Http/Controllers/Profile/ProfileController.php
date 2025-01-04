@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Enums\FileType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Profile\ProfileResource;
-use App\Http\Resources\SwipeResource;
+use App\Http\Resources\MatchedSwipeResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,7 @@ class ProfileController extends Controller
     {
         $users = User::with(['photos'])->get();
 
-        return SwipeResource::collection($users);
+        return MatchedSwipeResource::collection($users);
     }
 
     /**
