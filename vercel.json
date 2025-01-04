@@ -40,11 +40,11 @@
         "VIEW_COMPILED_PATH": "/tmp",
 
         "DB_CONNECTION": "mysql",
-        "DB_HOST": "b9o45.h.filess.io",
-        "DB_PORT": "3305",
-        "DB_DATABASE": "linker_heightsong",
-        "DB_USERNAME": "linker_heightsong",
-        "DB_PASSWORD": "608b19e8c93993ac1610f95b1a347cff662b25b9",
+        "DB_HOST": "mysql-linker-chris-cea5.d.aivencloud.com",
+        "DB_PORT": 18630,
+        "DB_DATABASE": "defaultdb",
+        "DB_USERNAME": "avnadmin",
+        "DB_PASSWORD": "AVNS_j2iob49CT6zLXgy9F3s",
 
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
