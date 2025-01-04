@@ -80,7 +80,7 @@ class User extends Authenticatable
         return $this->belongsToMany(Conversation::class, 'conversation_user', 'user_id', 'conversation_id');
     }
 
-    public function swipeMatches()
+    public function swipeMatches(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(SwipeMatch::class, Swipe::class, 'user_id', 'swipe_id_1', 'id', 'id');
     }
