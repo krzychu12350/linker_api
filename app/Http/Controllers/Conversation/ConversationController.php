@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Conversation;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ConversationResource;
 use App\Models\Conversation;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class ConversationController extends Controller
@@ -58,5 +59,44 @@ class ConversationController extends Controller
 //            'data' => $conversationsData,
 //            'con' => new ConversationResource($conversationsData),
 //        ]);
+    }
+
+    /**
+     * Display a specific conversation.
+     *
+     */
+    public function show(User $user, Conversation $conversation)
+    {
+        // Get the authenticated user
+        $user = auth()->user();
+
+        // Check if the user is part of the conversation
+        if (!$conversation->users->contains($user)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You are not authorized to view this conversation.',
+            ], 403);
+        }
+
+        // Get the matched user (who is not the authenticated user)
+        $matchedUser = $conversation->users->where('id', '!=', $user->id)->first();
+
+        // Get the first photo URL of the matched user (if available)
+        $photoUrl = null;
+        if ($matchedUser && $matchedUser->photos->isNotEmpty()) {
+            // Assuming the first photo is the one you want
+            $photoUrl = $matchedUser->photos->first()->url; // Adjust to the correct column name for the photo URL
+        }
+
+        // Format the response as ConversationResource
+        $conversationData = [
+            'conversation' => $conversation,
+            'messages' => $conversation->messages, // Include messages related to the conversation
+            'matched_user' => $matchedUser, // The matched user details
+            'matched_user_photo_url' => $photoUrl, // The first photo URL of the matched user
+        ];
+
+        // Return the resource for the specific conversation
+        return new ConversationResource($conversationData);
     }
 }
