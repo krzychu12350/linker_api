@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Message;
 
+use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Resources\MessageResource;
@@ -40,6 +41,10 @@ class MessageController extends Controller
             'sender_id' => $validatedData['sender_id'], // Use the authenticated user's ID as the sender
             'receiver_id' =>  $validatedData['receiver_id'], // Get the other participant
         ]);
+
+        // Trigger the event to broadcast the message
+        event(new MessageSent($message));
+
      //   dd( $message);
         // Return the newly created message as a resource
         return new MessageResource($message);

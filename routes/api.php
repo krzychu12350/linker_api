@@ -38,17 +38,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/photos', [UserProfilePhotoController::class, 'update']);
         Route::delete('/photos/{id}', [UserProfilePhotoController::class, 'destroy']);
 
+        Route::apiResource('conversations.messages',MessageController::class )->shallow(false);
+
+
         Route::apiResource('conversations', ConversationController::class)->only([
             'index',
+            'show',
 //        'store',
         ]);
 
-        Route::prefix('/conversations/{conversation}')->group(function () {
-            Route::apiResource('messages', MessageController::class)->only([
-                'index',
-                'store',
-            ]);
-        });
+//        Route::prefix('/conversations/{conversation}')->group(function () {
+//            Route::apiResource('messages', MessageController::class)->only([
+//                'index',
+//                'store',
+//            ]);
+//        });
 
     });
 
