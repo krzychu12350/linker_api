@@ -80,6 +80,37 @@ class UserInterestService
         })->toArray();
     }
 
+    private function mapSelectedDetails($details, array $selectedDetailsIds = []): array
+    {
+        $selectedDetailsSet = collect($selectedDetailsIds); // Create a set for faster lookup
+
+        return $details->map(function ($group) use ($selectedDetailsSet) {
+            // Filter options in the group for those where is_selected is true
+            $selectedOptions = $group->children->flatMap(function ($subGroup) use ($selectedDetailsSet) {
+                // Get selected options from subgroups or directly from the group
+                return $subGroup->children->filter(function ($option) use ($selectedDetailsSet) {
+                    return $selectedDetailsSet->contains($option->id); // Only keep selected options
+                })->map(function ($option) {
+                    return [
+                        'id' => $option->id,
+                        'name' => $option->name,
+                    ];
+                });
+            });
+
+            // If no selected options exist, skip this group
+            if ($selectedOptions->isEmpty()) {
+                return null;
+            }
+
+            return [
+                'group' => $group->name,
+                'selected_options' => $selectedOptions->toArray(),
+            ];
+        })->filter()->toArray(); // Filter out null groups
+    }
+
+
     public function getAllUserDetails(): array
     {
         $details = $this->fetchDetails();
@@ -102,6 +133,74 @@ class UserInterestService
 
         return $this->mapDetails($this->fetchDetails(), $selectedDetailsIds);
     }
+
+
+    public function getUserSelectedOptionForEachGroup(User $user): array
+    {
+        $data = $this->getAllUserDetailsWithSelection($user);
+
+        $selectedOptions = [];
+
+        foreach ($data as $group) {
+            $filteredGroup = $group;
+            $filteredGroup['options'] = []; // Initialize options
+            $filteredGroup['subGroups'] = []; // Initialize subGroups, if needed
+
+            // Process subGroups if they exist
+            if (isset($group['subGroups']) && !empty($group['subGroups'])) {
+                foreach ($group['subGroups'] as $subGroup) {
+                    $filteredSubGroup = $subGroup;
+
+                    // Filter and map selected options
+                    $filteredSubGroup['options'] = array_values(array_map(function ($option) {
+                        unset($option['is_selected']); // Remove "is_selected"
+                        return $option;
+                    }, array_filter($subGroup['options'], function ($option) {
+                        return $option['is_selected'] === true;
+                    })));
+
+                    // Add the subGroup only if it has selected options
+                    if (!empty($filteredSubGroup['options'])) {
+                        $filteredGroup['subGroups'][] = $filteredSubGroup;
+                    }
+                }
+            }
+
+            // Process options if they exist
+            if (isset($group['options'])) {
+                $filteredGroup['options'] = array_values(array_map(function ($option) {
+                    unset($option['is_selected']); // Remove "is_selected"
+                    return $option;
+                }, array_filter($group['options'], function ($option) {
+                    return $option['is_selected'] === true;
+                })));
+            }
+
+            // Remove `options` key if group has subGroups
+            if (!empty($filteredGroup['subGroups'])) {
+                unset($filteredGroup['options']);
+            }
+
+            // Remove the subGroups key if empty
+            if (empty($filteredGroup['subGroups'])) {
+                unset($filteredGroup['subGroups']);
+            }
+
+            // Add the group only if it has non-empty options or subGroups
+            if (!empty($filteredGroup['options']) || isset($filteredGroup['subGroups'])) {
+                $selectedOptions[] = $filteredGroup;
+            }
+        }
+
+        return $selectedOptions;
+    }
+
+
+
+
+
+
+
 
     /**
      * Update the user details with the provided group and sub-group IDs.
