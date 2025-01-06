@@ -10,11 +10,16 @@ use App\Http\Resources\SwipeResource;
 use App\Models\Swipe;
 use App\Models\SwipeMatch;
 use App\Models\User;
+use App\Services\UserInterestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SwipeController extends Controller
 {
+    public function __construct(private readonly UserInterestService $userInterestService)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -23,7 +28,7 @@ class SwipeController extends Controller
         $user = auth()->user();
 //        dd(Auth::id());
         $users = User::with(['photos'])
-            ->where('id', '!=', Auth::id() ??  $user->id) // Exclude the current authenticated user
+            ->where('id', '!=', Auth::id() ?? $user->id) // Exclude the current authenticated user
             ->get();
 
         return SwipeResource::collection($users);
@@ -96,9 +101,28 @@ class SwipeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        // dd($user->toArray());
+
+           // dd( $this->userInterestService->getUserSelectedOptionForEachGroup($user));
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'primary' => [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
+                    'city' => $user->city,
+                    'profession' => $user->profession,
+                    'bio' => $user->bio,
+                    'weight' => $user->weight,
+                    'height' => $user->height,
+                    'age' => $user->age,
+                ],
+                'details' => $this->userInterestService->getUserSelectedOptionForEachGroup($user),
+            ]
+        ]);
     }
 
     /**

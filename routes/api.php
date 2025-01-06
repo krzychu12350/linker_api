@@ -38,6 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/photos', [UserProfilePhotoController::class, 'index']);
         Route::post('/photos', [UserProfilePhotoController::class, 'update']);
         Route::delete('/photos/{id}', [UserProfilePhotoController::class, 'destroy']);
+
+        Route::get('/swipe-data', [SwipeController::class, 'show']);
     });
 
 

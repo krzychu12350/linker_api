@@ -35,8 +35,9 @@ class SwipeResource extends JsonResource
                 'first_name' => $this->resource->first_name,
                 'age' => $this->resource->age,
                 'photo' =>  $photoUrl,  // Cloudinary URL or empty string
+                'photos' => PhotoResource::collection($this->resource->photos),
             ],
-            'photos' => PhotoResource::collection($this->resource->photos),
+
             // 'details' => $this->resource->allSelectedDetails(),
         ];
 
