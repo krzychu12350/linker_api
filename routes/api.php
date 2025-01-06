@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
 //            ]);
 //        });
 
+        Route::get('/swipe-data', [SwipeController::class, 'show']);
     });
 
 

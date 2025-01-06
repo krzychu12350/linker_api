@@ -14,12 +14,15 @@ use App\Models\Swipe;
 use App\Models\SwipeMatch;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Auth;
+use App\Services\UserInterestService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SwipeController extends Controller
 {
+    public function __construct(private readonly UserInterestService $userInterestService)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -130,9 +133,28 @@ class SwipeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        // dd($user->toArray());
+
+           // dd( $this->userInterestService->getUserSelectedOptionForEachGroup($user));
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'primary' => [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
+                    'city' => $user->city,
+                    'profession' => $user->profession,
+                    'bio' => $user->bio,
+                    'weight' => $user->weight,
+                    'height' => $user->height,
+                    'age' => $user->age,
+                ],
+                'details' => $this->userInterestService->getUserSelectedOptionForEachGroup($user),
+            ]
+        ]);
     }
 
     /**
