@@ -14,10 +14,20 @@ class MessageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $author = $this->sender;
+        $authorPhotoUrl =  $author->photos->isEmpty() ? "" :
+            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
+            . $author->photos->first()->url;
+
         return [
             'body' => $this->body,
             'read_at' => $this->read_at,
             'is_read' => (bool) $this->read_at,  // Assuming is_read is determined based on read_at
+            'author' => [
+                'id' => $this->sender->id,
+                'first_name' => $this->sender->first_name,
+                'photo' => $authorPhotoUrl,
+            ],
         ];
     }
 }
