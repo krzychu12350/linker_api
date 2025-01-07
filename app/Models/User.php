@@ -89,26 +89,28 @@ class User extends Authenticatable
     {
         $userId = auth()->id(); // Get the current authenticated user's ID
 
-        // First attempt to get swipe matches where swipe_id_1 is the current user
-        $swipes = $this->hasMany(SwipeMatch::class, 'swipe_id_1', 'id')
+        // Get swipe matches where swipe_id_1 is the current user
+        $swipes1 = $this->hasMany(SwipeMatch::class, 'swipe_id_1', 'id')
             ->where('swipe_id_1', $userId)
             ->with(['conversation.users' => function ($query) use ($userId) {
                 // Fetch users in the conversation, but exclude the authenticated user
                 $query->where('users.id', '!=', $userId);
-            }]);
+            }])
+            ->get(); // Fetch the collection
 
-        // If no results found, switch to swipe_id_2 as foreign key
-        if ($swipes->get()->isEmpty()) {
-            $swipes = $this->hasMany(SwipeMatch::class, 'swipe_id_2', 'id')
-                ->where('swipe_id_2', $userId)
-                ->with(['conversation.users' => function ($query) use ($userId) {
-                    // Fetch users in the conversation, but exclude the authenticated user
-                    $query->where('users.id', '!=', $userId);
-                }]);
-        }
+        // Get swipe matches where swipe_id_2 is the current user
+        $swipes2 = $this->hasMany(SwipeMatch::class, 'swipe_id_2', 'id')
+            ->where('swipe_id_2', $userId)
+            ->with(['conversation.users' => function ($query) use ($userId) {
+                // Fetch users in the conversation, but exclude the authenticated user
+                $query->where('users.id', '!=', $userId);
+            }])
+            ->get(); // Fetch the collection
 
-        return $swipes;
+        // Concatenate the two collections
+        return $swipes1->concat($swipes2);
     }
+
 
 
 
