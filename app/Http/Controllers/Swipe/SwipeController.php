@@ -194,7 +194,8 @@ class SwipeController extends Controller
         $user = auth()->user();
 
         // Retrieve all swipeMatches where the current user's ID is swipe_id_1 or swipe_id_2
-        $swipes = $user->swipeMatches()->get();
+        $swipes = $user->swipeMatches();
+       // dd($swipes->toArray());
 //        $swipes = SwipeMatch::all();
 //        //dd(  SwipeMatch::all()->toArray());
 //        // Initialize an array to store matched users where swipe_id_2 matches
