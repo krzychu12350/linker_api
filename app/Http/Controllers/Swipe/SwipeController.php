@@ -68,6 +68,21 @@ class SwipeController extends Controller
             ], 404);
         }
 
+        $existingMatch = SwipeMatch::where(function ($query) use ($validated) {
+            $query->where('swipe_id_1', $validated['user_id'])
+                ->where('swipe_id_2', $validated['swiped_user_id']);
+        })->orWhere(function ($query) use ($validated) {
+            $query->where('swipe_id_1', $validated['swiped_user_id'])
+                ->where('swipe_id_2', $validated['user_id']);
+        })->first();
+
+        if ($existingMatch) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'A match with this user already exists.'
+            ], 400);
+        }
+
         // Check if the swipe already exists
         $swipe = Swipe::firstOrCreate(
             [
@@ -179,32 +194,32 @@ class SwipeController extends Controller
         $user = auth()->user();
 
         // Retrieve all swipeMatches where the current user's ID is swipe_id_1 or swipe_id_2
-        //$swipes = $user->swipeMatches()->get();
-        $swipes = SwipeMatch::all();
-        //dd(  SwipeMatch::all()->toArray());
-        // Initialize an array to store matched users where swipe_id_2 matches
-        $matchedUsers = [];
-        // Loop through each swipeMatch
-        foreach ($swipes as $swipe) {
-            // Check if swipe_id_2 matches the authenticated user's ID
-            if ($swipe->swipe_id_1 == $user->id) {
-
-                // Find the user who swiped on the authenticated user (where swipe_id_1 matches)
-                $matchedUser = User::find($swipe->swipe_id_2);
-
-                // Add the matched user to the array
-                $matchedUsers[] = $matchedUser;
-            } elseif ($swipe->swipe_id_2 == $user->id) {
-
-                // Find the user who swiped on the authenticated user (where swipe_id_1 matches)
-                $matchedUser = User::find($swipe->swipe_id_1);
-
-                // Add the matched user to the array
-                $matchedUsers[] = $matchedUser;
-            }
-        }
+        $swipes = $user->swipeMatches()->get();
+//        $swipes = SwipeMatch::all();
+//        //dd(  SwipeMatch::all()->toArray());
+//        // Initialize an array to store matched users where swipe_id_2 matches
+//        $matchedUsers = [];
+//        // Loop through each swipeMatch
+//        foreach ($swipes as $swipe) {
+//            // Check if swipe_id_2 matches the authenticated user's ID
+//            if ($swipe->swipe_id_1 == $user->id) {
+//
+//                // Find the user who swiped on the authenticated user (where swipe_id_1 matches)
+//                $matchedUser = User::find($swipe->swipe_id_2);
+//
+//                // Add the matched user to the array
+//                $matchedUsers[] = $matchedUser;
+//            } elseif ($swipe->swipe_id_2 == $user->id) {
+//
+//                // Find the user who swiped on the authenticated user (where swipe_id_1 matches)
+//                $matchedUser = User::find($swipe->swipe_id_1);
+//
+//                // Add the matched user to the array
+//                $matchedUsers[] = $matchedUser;
+//            }
+//        }
 
         // Return matched users with the specified relationships
-        return MatchedSwipeResource::collection($matchedUsers);
+        return MatchedSwipeResource::collection( $swipes);
     }
 }

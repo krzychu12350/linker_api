@@ -27,4 +27,12 @@ class SwipeMatch extends Model
         return $this->belongsTo(User::class, 'swipe_id_1');
     }
 
+    /**
+     * Get the conversation associated with the swipe match.
+     */
+    public function conversation()
+    {
+        return $this->hasOne(Conversation::class, 'match_id'); // match_id is the foreign key in the conversations table
+    }
+
 }

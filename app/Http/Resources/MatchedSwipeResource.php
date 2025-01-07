@@ -23,23 +23,28 @@ class MatchedSwipeResource extends JsonResource
 //        $photoUrl = $this->resource->photos->isEmpty() ? "" : cloudinary()->getUrl(
 //            $this->resource->photos->first()->url
 //        );
+        // dd($this->resource->conversation->users->first());
+
+        $secondUser = $this->resource->conversation->users->first();
+        $conversation = $this->resource->conversation;
+        $secondUserPhotos = $secondUser->photos;
 
         // Build the photo URL (using Cloudinary or empty string if no photos exist)
-        $photoUrl = $this->resource->photos->isEmpty()
+        $photoUrl = $secondUserPhotos->isEmpty()
             ? ""
             : "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
-            . $this->resource->photos->first()->url;
+            . $secondUserPhotos->first()->url;
 
 
         return [
 //            'user' => [
-                'swipe_id' => $this->resource->id,
-                'conversation_id' => $this->resource->conversations?->last()?->id,
-                'first_name' => $this->resource->first_name,
-                'last_name' => $this->resource->last_name,
-                'age' => $this->resource->age,
-                'major_photo' =>  $photoUrl,  // Cloudinary URL or empty string
-                'photos' => PhotoResource::collection($this->resource->photos),
+            'swipe_id' => $secondUser->id,
+            'conversation_id' => $conversation->id,
+            'first_name' => $secondUser->first_name,
+            'last_name' => $secondUser->last_name,
+            'age' => $secondUser->age,
+            'major_photo' => $photoUrl,  // Cloudinary URL or empty string
+            //'photos' => PhotoResource::collection($this->resource->photos),
 //            ],
 //            'photos' => PhotoResource::collection($this->resource->photos),
             // 'details' => $this->resource->allSelectedDetails(),

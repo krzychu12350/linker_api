@@ -80,10 +80,36 @@ class User extends Authenticatable
         return $this->belongsToMany(Conversation::class, 'conversation_user', 'user_id', 'conversation_id');
     }
 
-    public function swipeMatches(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+//    public function swipeMatches(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+//    {
+//        return $this->hasManyThrough(SwipeMatch::class, Swipe::class, 'user_id', 'swipe_id_1', 'id', 'id');
+//    }
+
+    public function swipeMatches()
     {
-        return $this->hasManyThrough(SwipeMatch::class, Swipe::class, 'user_id', 'swipe_id_1', 'id', 'id');
+        $userId = auth()->id(); // Get the current authenticated user's ID
+
+        // First attempt to get swipe matches where swipe_id_1 is the current user
+        $swipes = $this->hasMany(SwipeMatch::class, 'swipe_id_1', 'id')
+            ->where('swipe_id_1', $userId)
+            ->with(['conversation.users' => function ($query) use ($userId) {
+                // Fetch users in the conversation, but exclude the authenticated user
+                $query->where('users.id', '!=', $userId);
+            }]);
+
+        // If no results found, switch to swipe_id_2 as foreign key
+        if ($swipes->get()->isEmpty()) {
+            $swipes = $this->hasMany(SwipeMatch::class, 'swipe_id_2', 'id')
+                ->where('swipe_id_2', $userId)
+                ->with(['conversation.users' => function ($query) use ($userId) {
+                    // Fetch users in the conversation, but exclude the authenticated user
+                    $query->where('users.id', '!=', $userId);
+                }]);
+        }
+
+        return $swipes;
     }
+
 
 
     /**
