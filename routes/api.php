@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Ban\UserBanController;
 use App\Http\Controllers\Conversation\ConversationController;
 use App\Http\Controllers\Detail\DetailController;
 use App\Http\Controllers\HealthCheckController;
@@ -55,6 +56,8 @@ Route::middleware('auth:sanctum')->group(function () {
 //        });
 
         Route::get('/swipe-data', [SwipeController::class, 'show']);
+
+        Route::patch('/ban', [UserBanController::class, 'update']);
     });
 
 
@@ -78,7 +81,6 @@ Route::middleware('auth:sanctum')->group(function () {
     ]);
 
     Route::get('/swipes/matches', [SwipeController::class, 'getMatchedSwipes']);
-
 });
 
 //Route::apiResource('profiles', ProfileController::class)->only([
