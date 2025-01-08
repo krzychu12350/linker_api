@@ -28,3 +28,18 @@ Broadcast::channel('conversation.{conversation_id}', function ($user, $conversat
     return true;
 });
 
+
+
+Broadcast::channel('call.{id}', function ($user) {
+    return true;
+});
+
+Broadcast::channel('handshake.{id}', function ($user) {
+    return true;
+});
+
+Broadcast::channel('online-users', function ($user) {
+    return [
+        "id"=> $user->id
+    ];
+});

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CallController;
 use App\Http\Controllers\Conversation\ConversationController;
 use App\Http\Controllers\Detail\DetailController;
 use App\Http\Controllers\HealthCheckController;
@@ -87,3 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
+
+Route::post('start-call', [CallController::class, 'startCall'])->name('start.call');
+Route::post('answer-call', [CallController::class, 'AnswerCall'])->name('answer.call');
+Route::post('handshake', [CallController::class, 'handshake'])->name('handshake');
