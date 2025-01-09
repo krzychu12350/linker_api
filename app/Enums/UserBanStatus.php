@@ -11,4 +11,5 @@ enum UserBanStatus: int
     case BANNED = 1;
     case UNBANNNED = 0;
 
+
 }
