@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\FileResource;
 use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -63,7 +64,8 @@ class MessageSent implements ShouldBroadcastNow
                 'author' => [
                     'id' => $this->message->sender->id,
                     'first_name' => $this->message->sender->first_name,
-                ]
+                ],
+                'files' => FileResource::collection($this->message->files)
             ]
         ];
     }

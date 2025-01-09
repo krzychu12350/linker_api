@@ -41,4 +41,13 @@ class Message extends Model
     {
         return $this->belongsTo(User::class, 'receiver_id');
     }
+
+    /**
+     * Get the files associated with the message.
+     */
+    public function files()
+    {
+        return $this->belongsToMany(File::class, 'file_message', 'message_id', 'file_id')
+            ->withTimestamps();
+    }
 }

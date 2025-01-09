@@ -18,7 +18,12 @@ class StoreMessageRequest extends FormRequest
         $conversationId = $this->route('conversationId'); // Get the conversation ID from route
 
         return [
-            'body' => 'required|string',
+            // `body` is required only if `file` is not provided
+            'body' => 'required_without:file|string',
+
+            // `file` validation (optional, customize as needed)
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp3,mp4,pdf|max:10240', // Max size: 10MB
+
             'sender_id' => [
                 'required',
                 'exists:users,id', // sender_id must exist in the users table
@@ -41,4 +46,14 @@ class StoreMessageRequest extends FormRequest
             ],
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'body.required_without' => 'The message body is required if no file is attached.',
+            'file.mimes' => 'The file must be of type: jpg, jpeg, png, gif, mp3, mp4, pdf.',
+            'file.max' => 'The file may not be greater than 10MB.',
+        ];
+    }
+
 }

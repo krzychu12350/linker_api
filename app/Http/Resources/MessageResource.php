@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,7 @@ class MessageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
         $author = $this->sender;
         $authorPhotoUrl =  $author->photos->isEmpty() ? "" :
             "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
@@ -28,6 +30,7 @@ class MessageResource extends JsonResource
                 'first_name' => $this->sender->first_name,
                 'photo' => $authorPhotoUrl,
             ],
+            'files' => FileResource::collection($this->files)
         ];
     }
 }
