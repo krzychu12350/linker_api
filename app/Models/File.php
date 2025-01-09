@@ -38,4 +38,13 @@ class File extends Model
     {
         return $this->belongsToMany(User::class, 'image_user', 'image_id', 'user_id');
     }
+
+    /**
+     * Get the messages that the file is attached to.
+     */
+    public function messages()
+    {
+        return $this->belongsToMany(Message::class, 'file_message', 'file_id', 'message_id')
+            ->withTimestamps();
+    }
 }
