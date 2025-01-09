@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\MessageType;
 use App\Http\Resources\FileResource;
 use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
@@ -53,11 +54,13 @@ class MessageSent implements ShouldBroadcastNow
      */
     public function broadcastWith(): array
     {
+        $messageFiles = $this->message->files;
+
         return [
             'message' => [
                 'id' => $this->message->id,
                 'body' => $this->message->body,
-                'type' => $this->message->type,
+                'type' => $messageFiles->isEmpty() ? MessageType::TEXT : MessageType::FILE,
                 'read_at' => $this->message->read_at,
                 'sender_id' => $this->message->sender->id,
                 'receiver_id' => $this->message->receiver->id,

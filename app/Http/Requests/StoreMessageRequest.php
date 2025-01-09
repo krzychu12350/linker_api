@@ -20,9 +20,9 @@ class StoreMessageRequest extends FormRequest
         return [
             // `body` is required only if `file` is not provided
             'body' => 'required_without:file|string',
-
+            //|mimes:jpg,jpeg,png,gif,mp3,mp4,pdf|max:10240
             // `file` validation (optional, customize as needed)
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp3,mp4,pdf|max:10240', // Max size: 10MB
+            'file' => 'nullable|file', // Max size: 10MB
 
             'sender_id' => [
                 'required',

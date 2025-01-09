@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\MessageType;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,19 +19,30 @@ class ConversationResource extends JsonResource
         $photoUrl = "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
             . $this->resource['matched_user_photo_url'];
 
+
         // Map messages to include author details
         $messagesWithAuthors = $this->resource["messages"]->map(function ($message) {
-            return [
+            $messageFiles = $message->files;
+
+            $messageArray = [
                 'id' => $message->id,
                 'body' => $message->body,
-                'type' => $message->type,
+                'type' => $messageFiles->isEmpty() ? MessageType::TEXT : MessageType::FILE,
                 'read_at' => $message->read_at,
                 'author' => [
                     'id' => $message->sender->id,
                     'first_name' => $message->sender->first_name,
                 ],
             ];
+
+            // Conditionally add 'files' only if it's not empty
+            if (!$messageFiles->isEmpty()) {
+                $messageArray['files'] = FileResource::collection($messageFiles);
+            }
+
+            return $messageArray;
         });
+
 
         return [
             'id' => $this->resource["conversation"]->id,
