@@ -12,6 +12,9 @@ use App\Http\Controllers\User\Photo\UserProfilePhotoController;
 use App\Http\Controllers\User\Profile\UserProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\User\ReportController;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -87,3 +90,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
+
+// Grupa dla administratorów/moderatorów
+Route::prefix('admin')->group(function () {
+    Route::apiResource('reports', AdminReportController::class);
+});
+
+// Grupa dla użytkowników
+Route::apiResource('reports', ReportController::class)->only(['index', 'store', 'show']);
+
+

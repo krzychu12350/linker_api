@@ -14,6 +14,7 @@ class Report extends Model
     protected $fillable = [
         'description',
         'type',
+
 //        'user_id'
     ];
 
@@ -29,6 +30,10 @@ class Report extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function files()
+    {
+        return $this->belongsToMany(File::class, 'file_report');
     }
 
 }
