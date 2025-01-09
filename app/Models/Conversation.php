@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ConversationType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +15,10 @@ class Conversation extends Model
         'name',
         'description',
         'match_id',
+    ];
+
+    protected $casts = [
+        'type' => ConversationType::class,
     ];
 
     // Conversation.php
