@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Report;
 use Illuminate\Http\Request;
 
 class AdminReportController extends Controller
@@ -45,16 +46,13 @@ class AdminReportController extends Controller
             }
         }
 
-        return response()->json([
-            'message' => 'Report created successfully',
-            'report' => $report->load('files')
-        ]);
+        return new ReportResource($report->load('files'));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $report)
+    public function show(Report $report)
     {
         return response()->json($report->load(['user', 'files']));
     }
@@ -70,7 +68,7 @@ class AdminReportController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Report $report)
     {
         $report->delete();
         return response()->json(['message' => 'Report deleted successfully']);

@@ -91,12 +91,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
 
-// Grupa dla administratorów/moderatorów
 Route::prefix('admin')->group(function () {
     Route::apiResource('reports', AdminReportController::class);
 });
 
-// Grupa dla użytkowników
-Route::apiResource('reports', ReportController::class)->only(['index', 'store', 'show']);
+Route::apiResource('reports', ReportController::class);
+
 
 
