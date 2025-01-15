@@ -8,6 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Model;
+
+
 
 class User extends Authenticatable
 {
@@ -235,5 +238,11 @@ class User extends Authenticatable
         // Fetch the details and map them
         $details = $this->fetchDetails();
         return $this->mapDetails($details, $selectedDetailsIds);
+    }
+
+
+    public function isCurrentlyBanned(): bool
+    {
+        return $this->is_banned && (!$this->banned_until || $this->banned_until->isFuture());
     }
 }

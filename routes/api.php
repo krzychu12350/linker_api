@@ -87,3 +87,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
+
+Route::resource('moderators', ModeratorController::class);
+
