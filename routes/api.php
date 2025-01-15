@@ -58,7 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
 //        });
 
         Route::get('/swipe-data', [SwipeController::class, 'show']);
+        Route::apiResource('reports', ReportController::class)->only([
+            'index',
+            'store',
+        ]);
     });
+
 
 
     Route::get('/matches', [MatchController::class, 'index']);
@@ -92,10 +97,9 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
 
 Route::prefix('admin')->group(function () {
-    Route::apiResource('reports', AdminReportController::class);
+    Route::apiResource('admin-reports', AdminReportController::class);
 });
 
-Route::apiResource('reports', ReportController::class);
 
 
 
