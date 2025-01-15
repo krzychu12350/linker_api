@@ -37,53 +37,41 @@ class UserBanController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     public function update(Request $request, User $user): JsonResponse
     {
+        // Pobieramy akcję z żądania ('ban' lub 'unban')
+        $action = $request->input('action');
+
+        // Sprawdzamy, czy akcja jest poprawna
+        if (!in_array($action, ['ban', 'unban'])) {
+            return response()->json([
+                'message' => 'Invalid action. Use "ban" or "unban".'
+            ], 400);
+        }
+
+        // Ustawiamy odpowiedni status na podstawie akcji
+        $newStatus = $action === 'ban' ? UserBanStatus::BANNED : UserBanStatus::UNBANNNED;
+
+        // Sprawdzamy, czy użytkownik ma już ten status
+        if ($user->is_banned == $newStatus) {
+            $statusMessage = $action === 'ban' ? 'User is already banned' : 'User is already unbanned';
+
+            return response()->json([
+                'message' => $statusMessage
+            ]);
+        }
+
+        // Aktualizujemy status użytkownika
         $user->update([
-            'is_banned' => UserBanStatus::BANNED,
+            'is_banned' => $newStatus,
         ]);
+
+        $successMessage = $action === 'ban' ? 'User has been banned successfully' : 'User has been unbanned successfully';
 
         return response()->json([
-            'message' => 'Status updated successfully'
+            'message' => $successMessage
         ]);
-//        // Pobieramy status z żądania (oczekujemy np. 'ban' lub 'unban')
-//        $action = $request->input('action');
-//
-//        if ($action === 'ban') {
-//            if ($user->is_banned == UserBanStatus::BANNED) {
-//                return response()->json([
-//                    'message' => 'User is already banned'
-//                ]);
-//            }
-//
-//            $user->update([
-//                'is_banned' => UserBanStatus::BANNED,
-//            ]);
-//
-//            return response()->json([
-//                'message' => 'User has been banned successfully'
-//            ]);
-//        } elseif ($action === 'unban') {
-//            if ($user->is_banned == UserBanStatus::UNBANNNED) {
-//                return response()->json([
-//                    'message' => 'User is already unbanned'
-//                ]);
-//            }
-//
-//            $user->update([
-//                'is_banned' => UserBanStatus::UNBANNNED,
-//            ]);
-//
-//            return response()->json([
-//                'message' => 'User has been unbanned successfully'
-//            ]);
-//        }
-//
-//        return response()->json([
-//            'message' => 'Invalid action. Use "ban" or "unban".'
-//        ], 400);
-//    }
-
     }
 
     /**
