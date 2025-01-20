@@ -32,8 +32,9 @@ class MatchedSwipeResource extends JsonResource
         // Build the photo URL (using Cloudinary or empty string if no photos exist)
         $photoUrl = $secondUserPhotos->isEmpty()
             ? ""
-            : "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
-            . $secondUserPhotos->first()->url;
+            :
+//            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/" .
+            $secondUserPhotos->first()->url;
 
 
         return [
