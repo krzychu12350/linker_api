@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Conversation;
+namespace App\Http\Controllers\User\Conversation;
 
+use App\Enums\ConversationType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GroupConversation\GroupConversationStoreRequest;
 use App\Http\Resources\ConversationResource;
 use App\Models\Conversation;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 
 class ConversationController extends Controller
 {
@@ -50,8 +52,8 @@ class ConversationController extends Controller
                 'matched_user_photo_url' => $photoUrl, // The first photo URL of the matched user
             ];
         });
-       // return $conversationsData->toArray();
-        return  ConversationResource::collection($conversationsData->toArray());
+        // return $conversationsData->toArray();
+        return ConversationResource::collection($conversationsData->toArray());
 
         // Return the list of conversations with their messages and matched user
 //        return response()->json([

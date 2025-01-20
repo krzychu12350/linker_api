@@ -94,7 +94,15 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'prefer',
+            'schema'   => 'public',
+            'sslmode'  => 'require',
+            'options'  => [
+                PDO::ATTR_PERSISTENT => true,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            ],
+            'pdo' => [
+                'options' => env('DB_OPTIONS'),
+            ],
         ],
 
         'sqlsrv' => [
