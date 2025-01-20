@@ -46,6 +46,12 @@
         "DB_USERNAME": "neondb_owner",
         "DB_PASSWORD": "endpoint=ep-small-wave-a21u1fye;npg_umlZov0cRF3T",
 
+        "BROADCAST_DRIVER": "pusher",
+        "PUSHER_APP_ID": "1843953",
+        "PUSHER_APP_KEY": "26143f87a08bdfeab780",
+        "PUSHER_APP_SECRET": "bc9f0158cdd1ebd43f76",
+        "PUSHER_APP_CLUSTER": "eu",
+
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"

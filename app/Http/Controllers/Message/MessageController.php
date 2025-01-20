@@ -64,13 +64,12 @@ class MessageController extends Controller
                 'folder' => 'messages',
             ]);
 
-
             // Retrieve the file information (you can also save other details like public_id or URL)
             $fileRecord = File::create([
-                'url' => $uploadedFile->getPublicId(),
+//                'url' => $uploadedFile->getPublicId(),
+                'url' => $uploadedFile->getSecurePath(),
                 'type' => $fileType, // Store the file type as a string from the enum
             ]);
-
 
             // Attach the file to the created message
             $message->files()->attach($fileRecord);

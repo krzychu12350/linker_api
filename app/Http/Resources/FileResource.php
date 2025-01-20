@@ -17,7 +17,8 @@ class FileResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'url' => CloudinaryHelper::getFileUrl($this->url),
+            //'url' => CloudinaryHelper::getFileUrl($this->url),
+            'url' => $this->url,
             'type' => $this->type,
             'uploaded_at' => $this->created_at,
         ];
