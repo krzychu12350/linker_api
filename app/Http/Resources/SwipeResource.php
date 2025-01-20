@@ -15,8 +15,8 @@ class SwipeResource extends JsonResource
     public function toArray(Request $request): array
     {
         $photoUrl = $this->resource->photos->isEmpty() ? "" :
-            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
-            . $this->resource->photos->first()->url;
+//            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/" .
+            $this->resource->photos->first()->url;
 
 
         return [
