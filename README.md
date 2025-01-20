@@ -64,3 +64,11 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+        "DB_CONNECTION": "mysql",
+        "DB_HOST": "wyq84.h.filess.io",
+        "DB_PORT": "3305",
+        "DB_DATABASE": "bondify_thendeeply",
+        "DB_USERNAME": "bondify_thendeeply",
+        "DB_PASSWORD": "0507e7c7316118b1f2fa39c6745eb2ad680854c4",
