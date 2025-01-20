@@ -55,8 +55,8 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         $photoUrl = $user->photos->isEmpty() ? "" :
-            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
-            . $user->photos->first()->url;
+           // "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/" .
+            $user->photos->first()->url;
 
         // Return the user data along with the token
         return response()->json([
