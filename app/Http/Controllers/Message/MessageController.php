@@ -88,6 +88,8 @@ class MessageController extends Controller
         // Trigger the event to broadcast the message
         event(new MessageSent($message));
 
+        broadcast(new MessageSent($message));
+
         //   dd( $message);
         // Return the newly created message as a resource
         return new MessageResource($message);
