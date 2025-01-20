@@ -10,6 +10,7 @@ use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\File;
 use App\Models\Message;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
@@ -86,8 +87,9 @@ class MessageController extends Controller
 
 
         // Trigger the event to broadcast the message
-        event(new MessageSent($message));
+      //  event(new MessageSent($message));
 
+       // broadcast(new MessageSent($message));
         broadcast(new MessageSent($message));
 
         //   dd( $message);
