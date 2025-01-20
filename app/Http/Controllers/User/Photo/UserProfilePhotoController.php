@@ -34,11 +34,11 @@ class UserProfilePhotoController extends Controller
         $photos = $files->map(function ($file) {
             // Construct the full URL using APP_URL, storage path, and the file URL
             // $fullUrl = env('APP_URL') . '/storage' . parse_url($file->url, PHP_URL_PATH);
-            $fullUrl = $this->storageStrategy->get($file->url);
+           // $fullUrl = $this->storageStrategy->get($file->url);
 
             return [
                 'id' => $file->id,
-                'url' => $fullUrl, // Full URL to the profile photo
+                'url' => $file->url, // Full URL to the profile photo
             ];
         });
 
@@ -71,7 +71,7 @@ class UserProfilePhotoController extends Controller
                 'type' => FileType::IMAGE,
             ]);
 
-            $file->url = $this->storageStrategy->get($file->url);
+//            $file->url = $this->storageStrategy->get($file->url);
 
             // Attach the file to the user via the pivot table
             $user->files()->attach($file->id);

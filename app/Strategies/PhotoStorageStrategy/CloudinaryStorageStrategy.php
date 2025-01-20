@@ -40,7 +40,8 @@ class CloudinaryStorageStrategy implements PhotoStorageStrategy
 //            ]
         ]);
        // dd('dwdwdw', $data->getPublicId());
-        return $data->getPublicId();
+//        return $data->getPublicId();
+        return $data->getSecurePath();
 
 
 //        dd($data);
