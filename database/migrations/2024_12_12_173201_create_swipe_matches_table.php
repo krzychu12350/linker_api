@@ -20,12 +20,12 @@ return new class extends Migration
 //            $table->foreignId('swipe_id_1')->constrained('swipes')->cascadeOnDelete();
 //            $table->foreignId('swipe_id_2')->constrained('swipes')->cascadeOnDelete();
 
-            $table->foreign('swipe_id_1')->references('user_id')
-                ->on('swipes')
-                ->onDelete('cascade');
-            $table->foreign('swipe_id_2')->references('swiped_user_id')
-                ->on('swipes')
-                ->onDelete('cascade');
+//            $table->foreign('swipe_id_1')->references('user_id')
+//                ->on('swipes')
+//                ->onDelete('cascade');
+//            $table->foreign('swipe_id_2')->references('swiped_user_id')
+//                ->on('swipes')
+//                ->onDelete('cascade');
 
             $table->timestamps();
         });
