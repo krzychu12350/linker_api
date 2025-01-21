@@ -9,6 +9,7 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\Message\MessageController;
 use App\Http\Controllers\Swipe\SwipeController;
 use App\Http\Controllers\User\Conversation\ConversationController;
+use App\Http\Controllers\User\Conversation\UserGroupConversationController;
 use App\Http\Controllers\User\Detail\UserDetailController;
 use App\Http\Controllers\User\Photo\UserProfilePhotoController;
 use App\Http\Controllers\User\Profile\UserProfileController;
@@ -48,6 +49,10 @@ Route::middleware('auth:sanctum')->group(function () {
             'show',
         ]);
 
+        Route::apiResource('groups', UserGroupConversationController::class)->only([
+            'index',
+        ]);
+
 //        Route::prefix('/conversations/{conversation}')->group(function () {
 //            Route::apiResource('messages', MessageController::class)->only([
 //                'index',
@@ -82,6 +87,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Group conversations
     Route::apiResource('groups', GroupConversationController::class)->only([
+        'show',
         'store',
         'destroy'
     ]);

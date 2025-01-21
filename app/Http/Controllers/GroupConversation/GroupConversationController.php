@@ -12,6 +12,19 @@ use Illuminate\Http\JsonResponse;
 
 class GroupConversationController extends Controller
 {
+    public function show(Conversation $group): JsonResponse
+    {
+        return response()->json([
+            'status' => 'success',
+            'data' => $group->load('users')->only([
+                'id',
+                'name',
+                'users',
+                'users'
+            ]),
+        ]);
+    }
+
     /**
      * Store a newly created conversation and assign users to it.
      */
@@ -42,7 +55,7 @@ class GroupConversationController extends Controller
      */
     public function destroy(Conversation $group): JsonResponse
     {
-      //  dd($group->toArray());
+        //  dd($group->toArray());
         // Ensure the conversation is a group conversation
         if ($group->type !== ConversationType::GROUP) {
             return response()->json([
