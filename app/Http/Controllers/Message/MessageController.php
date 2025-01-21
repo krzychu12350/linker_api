@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers\Message;
 
+use App\Enums\MessageType;
 use App\Events\MessageSent;
 use App\Helpers\FileTypeHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMessageRequest;
+use App\Http\Resources\FileResource;
 use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\File;
 use App\Models\Message;
+use Cloudinary\Api\Exception\ApiError;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Support\Facades\Auth;
+use Pusher\PusherException;
 
 class MessageController extends Controller
 {
@@ -24,6 +29,11 @@ class MessageController extends Controller
     }
 
     // Store a new message for a conversation
+
+    /**
+     * @throws PusherException
+     * @throws ApiError
+     */
     public function store(StoreMessageRequest $request, int $userId, int $conversationId)
     {
         // dd($userId, $conversationId);
@@ -86,7 +96,56 @@ class MessageController extends Controller
 
 
         // Trigger the event to broadcast the message
-        event(new MessageSent($message));
+      //  event(new MessageSent($message));
+
+       // broadcast(new MessageSent($message));
+       // event(new MessageSent($message));
+
+        $custom_client = new \GuzzleHttp\Client();
+
+        $options = [
+            'cluster' => 'eu',
+            'useTLS' => false
+        ];
+        $pusher = new \Pusher\Pusher(
+           '26143f87a08bdfeab780',
+            'bc9f0158cdd1ebd43f76',
+            '1843953',
+            $options,
+            $custom_client
+        );
+
+        $messageFiles = $message->files;
+
+       $data = [
+            'message' => [
+                'id' => $message->id,
+                'body' => $message->body,
+                'type' => $messageFiles->isEmpty() ? MessageType::TEXT : MessageType::FILE,
+                'read_at' => $message->read_at,
+                'sender_id' => $message->sender->id,
+                'receiver_id' => $message->receiver->id,
+                'author' => [
+                    'id' => $message->sender->id,
+                    'first_name' => $message->sender->first_name,
+                ],
+                'files' => FileResource::collection($message->files)
+            ]
+        ];
+
+        $promise = $pusher->triggerAsync(
+            ['conversation.' . $message->conversation()->first()?->id],
+            'message.sent',
+            $data
+        );
+
+        $promise->then(function($result) {
+            // do something with $result
+            return $result;
+        });
+
+        $final_result = $promise->wait();
+      //  dd($final_result);
 
         //   dd( $message);
         // Return the newly created message as a resource

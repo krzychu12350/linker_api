@@ -19,8 +19,8 @@ class MessageResource extends JsonResource
 
         $author = $this->sender;
         $authorPhotoUrl =  $author->photos->isEmpty() ? "" :
-            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
-            . $author->photos->first()->url;
+//            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/" .
+            $author->photos->first()->url;
         $messageFiles = $this->files;
 
         return [

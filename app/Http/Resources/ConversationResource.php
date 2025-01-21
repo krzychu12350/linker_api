@@ -16,9 +16,9 @@ class ConversationResource extends JsonResource
     public function toArray(Request $request): array
     {
         // Get the photo URL of the matched user
-        $photoUrl = "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
-            . $this->resource['matched_user_photo_url'];
-
+//        $photoUrl = "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/"
+//            . $this->resource['matched_user_photo_url'];
+        $photoUrl = $this->resource['matched_user_photo_url'];
 
         // Map messages to include author details
         $messagesWithAuthors = $this->resource["messages"]->map(function ($message) {
