@@ -12,6 +12,7 @@ use App\Http\Controllers\User\Photo\UserProfilePhotoController;
 use App\Http\Controllers\User\Profile\UserProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ModeratorController;
 
 
 Route::get('/user', function (Request $request) {
@@ -88,5 +89,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
 
-Route::resource('moderators', ModeratorController::class);
+
+Route::get('/moderators', [ModeratorController::class, 'index']);
+Route::get('/moderators/{id}', [ModeratorController::class, 'show']);
+Route::post('/moderators', [ModeratorController::class, 'store']);
+Route::delete('/moderators/{id}', [ModeratorController::class, 'destroy']);
 
