@@ -236,4 +236,27 @@ class User extends Authenticatable
         $details = $this->fetchDetails();
         return $this->mapDetails($details, $selectedDetailsIds);
     }
+
+    public function blockedUsers()
+    {
+        return $this->hasMany(Block::class, 'blocker_id');
+    }
+
+// Użytkownicy, którzy zablokowali tego użytkownika
+    public function blockedByUsers()
+    {
+        return $this->hasMany(Block::class, 'blocked_id');
+    }
+
+// Czy zablokował danego użytkownika?
+    public function hasBlocked(User $user)
+    {
+        return $this->blockedUsers()->where('blocked_id', $user->id)->exists();
+    }
+
+// Czy został zablokowany przez danego użytkownika?
+    public function isBlockedBy(User $user)
+    {
+        return $this->blockedByUsers()->where('blocker_id', $user->id)->exists();
+    }
 }

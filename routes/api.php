@@ -13,7 +13,7 @@ use App\Http\Controllers\User\Photo\UserProfilePhotoController;
 use App\Http\Controllers\User\Profile\UserProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\BlockController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -89,3 +89,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/block', [BlockController::class, 'blockUser']);
+    Route::post('/unblock', [BlockController::class, 'unblockUser']);
+    Route::get('/blocked-users', [BlockController::class, 'getBlockedUsers']);
+});
