@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\User\ReportController;
+use App\Http\Controllers\BanController;
 
 
 
@@ -100,6 +101,9 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('admin-reports', AdminReportController::class);
 });
 
-
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/ban', [BanController::class, 'banUser']);
+    Route::post('/unban', [BanController::class, 'unbanUser']);
+});
 
 

@@ -236,4 +236,17 @@ class User extends Authenticatable
         $details = $this->fetchDetails();
         return $this->mapDetails($details, $selectedDetailsIds);
     }
+
+    // Banowania użytkownika
+    public function bans()
+    {
+        return $this->hasMany(Ban::class);
+    }
+
+// Czy użytkownik jest aktualnie zbanowany?
+    public function isBanned()
+    {
+        return $this->bans()->where('banned_until', '>', now())->exists();
+    }
+
 }
