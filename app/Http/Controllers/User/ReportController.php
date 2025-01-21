@@ -14,7 +14,12 @@ class ReportController extends Controller
      */
     public function index()
     {
-        $reports = Report::where('user_id', auth()->id())->with('files')->paginate(10);
+        // Check if the authenticated user is an admin
+        if (auth()->user()->isAdmin()) {
+            $reports = Report::with('files')->paginate(10); // Admin sees all reports
+        } else {
+            $reports = Report::where('user_id', auth()->id())->with('files')->paginate(10); // Regular user sees their own reports
+        }
 
         return ReportResource::collection($reports);
     }
@@ -24,37 +29,32 @@ class ReportController extends Controller
      */
     public function store(Request $request)
     {
-        // Walidacja danych wejściowych
+        // Validation
         $validatedData = $request->validate([
-            'description' => 'required|string|max:1000', // Opis jest wymagany
-            'type' => 'required|string|in:bug,feature,other', // Typ zgłoszenia, np. bug/feature/other
-            'files.*' => 'file|mimes:jpg,png,pdf,docx|max:2048', // Opcjonalne pliki
+            'description' => 'required|string|max:1000',
+            'type' => 'required|string|in:bug,feature,other',
+            'files.*' => 'file|mimes:jpg,png,pdf,docx|max:2048',
         ]);
 
-        // Tworzenie nowego zgłoszenia
+        // Creating new report
         $report = Report::create([
             'user_id' => auth()->id(),
             'description' => $validatedData['description'],
             'type' => $validatedData['type'],
         ]);
 
-        // Obsługa plików, jeśli zostały przesłane
+        // Handling files if any
         if ($request->has('files')) {
             foreach ($request->file('files') as $file) {
-                $filePath = $file->store('reports_files', 'public'); // Zapis pliku
-
-                // Tworzenie rekordu w tabeli 'files'
+                $filePath = $file->store('reports_files', 'public');
                 $fileModel = \App\Models\File::create([
                     'path' => $filePath,
                     'name' => $file->getClientOriginalName(),
                 ]);
-
-                // Powiązanie raportu z plikami w tabeli 'file_report'
                 $report->files()->attach($fileModel->id);
             }
         }
 
-        // Zwracanie odpowiedzi
         return new ReportResource($report);
     }
 
@@ -63,7 +63,14 @@ class ReportController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $report = Report::findOrFail($id);
+
+        // Check if the authenticated user is an admin or the owner of the report
+        if (auth()->user()->isAdmin() || $report->user_id === auth()->id()) {
+            return new ReportResource($report);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
 
     /**
@@ -71,7 +78,7 @@ class ReportController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // This method can be handled similarly to `show` with necessary checks for editing.
     }
 
     /**
@@ -79,6 +86,14 @@ class ReportController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $report = Report::findOrFail($id);
+
+        // Only admin can delete the report
+        if (auth()->user()->isAdmin()) {
+            $report->delete();
+            return response()->json(['message' => 'Report deleted successfully']);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
 }
