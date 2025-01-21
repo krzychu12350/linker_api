@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Message;
+namespace App\Http\Controllers\GroupConversation\Message;
 
 use App\Enums\ConversationType;
 use App\Enums\MessageType;
-use App\Events\MessageSent;
 use App\Helpers\FileTypeHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GroupConversation\User\GroupConversationUserRequest;
+use App\Http\Requests\StoreGroupMessageRequest;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Resources\FileResource;
 use App\Http\Resources\MessageResource;
@@ -14,13 +15,12 @@ use App\Models\Conversation;
 use App\Models\File;
 use App\Models\Message;
 use Cloudinary\Api\Exception\ApiError;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 use Pusher\PusherException;
 
-class MessageController extends Controller
+class GroupConversationMessageController extends Controller
 {
-    public function index(int $userId, int $conversationId)
+    public function index(int $conversationId)
     {
         // dd($userId, $conversationId);
         $conversation = Conversation::findOrFail($conversationId);
@@ -35,17 +35,12 @@ class MessageController extends Controller
      * @throws PusherException
      * @throws ApiError
      */
-    public function store(StoreMessageRequest $request, int $userId, int $conversationId)
+    public function store(StoreGroupMessageRequest $request, int $group)
     {
-        // dd($userId, $conversationId);
-        // Validate the incoming request
-//        $request->validate([
-//            'body' => 'required|string', // Make sure body is a string and required
-//        ]);
         $validatedData = $request->validated();
 
         // Find the conversation or fail if it doesn't exist
-        $conversation = Conversation::findOrFail($conversationId);
+        $conversation = Conversation::findOrFail($group);
 
         // Prepare the message data
         $messageData = [
@@ -84,23 +79,14 @@ class MessageController extends Controller
 
             // Attach the file to the created message
             $message->files()->attach($fileRecord);
-
-          //  dd( $message->files()->get());
-
-
-            // dd('dwdwdw', $data->getPublicId());
-
-            // Add the file details to the message
-           /// $messageData['file_path'] = $filePath;
-           // $messageData['file_type'] = $fileType->value; // Save the file type as a string from the enum
         }
 
 
         // Trigger the event to broadcast the message
-      //  event(new MessageSent($message));
+        //  event(new MessageSent($message));
 
-       // broadcast(new MessageSent($message));
-       // event(new MessageSent($message));
+        // broadcast(new MessageSent($message));
+        // event(new MessageSent($message));
 
         $custom_client = new \GuzzleHttp\Client();
 
@@ -109,7 +95,7 @@ class MessageController extends Controller
             'useTLS' => false
         ];
         $pusher = new \Pusher\Pusher(
-           '26143f87a08bdfeab780',
+            '26143f87a08bdfeab780',
             'bc9f0158cdd1ebd43f76',
             '1843953',
             $options,
@@ -118,7 +104,7 @@ class MessageController extends Controller
 
         $messageFiles = $message->files;
 
-       $data = [
+        $data = [
             'message' => [
                 'id' => $message->id,
                 'body' => $message->body,
@@ -148,11 +134,8 @@ class MessageController extends Controller
         });
 
         $final_result = $promise->wait();
-      //  dd($final_result);
 
-        //   dd( $message);
         // Return the newly created message as a resource
         return new MessageResource($message);
     }
-
 }

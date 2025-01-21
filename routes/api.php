@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Detail\DetailController;
 use App\Http\Controllers\GroupConversation\GroupConversationController;
+use App\Http\Controllers\GroupConversation\Message\GroupConversationMessageController;
 use App\Http\Controllers\GroupConversation\User\GroupConversationUserController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MatchController;
@@ -49,9 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'show',
         ]);
 
-        Route::apiResource('groups', UserGroupConversationController::class)->only([
-            'index',
-        ]);
+        Route::get('/groups', [UserGroupConversationController::class,'index'])->name('user.groups');
 
 //        Route::prefix('/conversations/{conversation}')->group(function () {
 //            Route::apiResource('messages', MessageController::class)->only([
@@ -86,16 +85,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/swipes/matches', [SwipeController::class, 'getMatchedSwipes']);
 
     // Group conversations
-    Route::apiResource('groups', GroupConversationController::class)->only([
-        'show',
-        'store',
-        'destroy'
-    ]);
+    Route::apiResource('groups', GroupConversationController::class);
 
     // Group conversation users
     Route::prefix('/groups/{group}')->group(function () {
         Route::post('/users', [GroupConversationUserController::class, 'store']);
         Route::delete('/users', [GroupConversationUserController::class, 'destroy']);
+
+        Route::apiResource('messages', GroupConversationMessageController::class);
     });
 });
 

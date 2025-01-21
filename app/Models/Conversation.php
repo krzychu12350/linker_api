@@ -57,4 +57,13 @@ class Conversation extends Model
     {
         return $this->belongsTo(SwipeMatch::class, 'match_id');
     }
+
+    /**
+     * Get the most recent message in the conversation.
+     */
+    public function lastMessage()
+    {
+        return $this->messages()->orderBy('created_at')->first();
+    }
+
 }

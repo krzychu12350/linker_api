@@ -12,6 +12,17 @@ use Illuminate\Http\JsonResponse;
 
 class GroupConversationController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        return response()->json([
+            'status' => 'success',
+            'data' => Conversation::where('type', ConversationType::GROUP)->get([
+                'id',
+                'name'
+            ]),
+        ]);
+    }
+
     public function show(Conversation $group): JsonResponse
     {
         return response()->json([
@@ -19,7 +30,6 @@ class GroupConversationController extends Controller
             'data' => $group->load('users')->only([
                 'id',
                 'name',
-                'users',
                 'users'
             ]),
         ]);

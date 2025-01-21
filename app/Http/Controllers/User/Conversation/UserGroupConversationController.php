@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers\User\Conversation;
 
-use App\Enums\ConversationType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\GroupConversation\GroupConversationStoreRequest;
-use App\Http\Resources\ConversationResource;
-use App\Models\Conversation;
+use App\Http\Resources\GroupConversationResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Js;
 
 class UserGroupConversationController extends Controller
 {
@@ -20,12 +16,15 @@ class UserGroupConversationController extends Controller
     {
         $user = auth()->user();
 
-        $userConversations = $user->conversations()->where('type', 'group')->get();
+        // Fetch group conversations with the last message eagerly loaded
+        $userConversations = $user->conversations()
+            ->with('users')
+            ->where('type', 'group')
+            ->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => $userConversations,
+            'data' => GroupConversationResource::collection($userConversations),
         ]);
     }
-
 }
