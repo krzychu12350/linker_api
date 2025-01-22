@@ -10,13 +10,17 @@ use Illuminate\Support\Facades\Auth;
 class BlockController extends Controller
 {
     // Blokowanie użytkownika
-    public function blockUser(Request $request)
+    public function blockUser(Request $request, User $user)
     {
         $blockedUserId = $request->input('blocked_id');
         $blockerId = Auth::id();
 
         if ($blockerId == $blockedUserId) {
             return response()->json(['error' => 'Cannot block yourself'], 400);
+        }
+
+        if (Block::where('blocker_id', $blockedUserId)->where('blocked_id', $blockerId)->exists()) {
+            return response()->json(['error' => 'Cannot block a user who has blocked you'], 400);
         }
 
         if (Block::where('blocker_id', $blockerId)->where('blocked_id', $blockedUserId)->exists()) {
@@ -29,7 +33,7 @@ class BlockController extends Controller
     }
 
     // Odblokowanie użytkownika
-    public function unblockUser(Request $request)
+    public function unblockUser(Request $request, User $user)
     {
         $blockedUserId = $request->input('blocked_id');
         $blockerId = Auth::id();

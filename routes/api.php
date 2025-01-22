@@ -58,6 +58,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/swipe-data', [SwipeController::class, 'show']);
 
         Route::patch('/ban', [UserBanController::class, 'update']);
+
+        Route::post('/block', [BlockController::class, 'blockUser']);
+        Route::post('/unblock', [BlockController::class, 'unblockUser']);
+        Route::get('/blocked-users', [BlockController::class, 'getBlockedUsers']);
     });
 
 
@@ -91,7 +95,5 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/block', [BlockController::class, 'blockUser']);
-    Route::post('/unblock', [BlockController::class, 'unblockUser']);
-    Route::get('/blocked-users', [BlockController::class, 'getBlockedUsers']);
+
 });
