@@ -9,6 +9,7 @@ use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\Message\MessageController;
 use App\Http\Controllers\Swipe\SwipeController;
+use App\Http\Controllers\TwilioVideoController;
 use App\Http\Controllers\User\Conversation\ConversationController;
 use App\Http\Controllers\User\Conversation\UserGroupConversationController;
 use App\Http\Controllers\User\Detail\UserDetailController;
@@ -102,3 +103,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/health', [HealthCheckController::class, 'healthCheck']);
+
+Route::post('/twilio/token', [TwilioVideoController::class, 'generateToken']);
