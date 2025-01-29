@@ -11,3 +11,16 @@ Obsluga edycji zgloszenia
 
 dodanie przy podjeciu decyzji ewent o wyniku zgloszenia (zgloszony uzytkownik zostal zbanowany, zgloszenie odrzucone)
 tj. dodanie do bazy nowego powiadomienia i wysylnie przez pushera do fronetu przez triggerowania zdarzenia
+
+Endpoint do wysylania maila z przypomniem hasla
+endpoint do restowania hasla z token, nowym haslem i potrawierdzeniem hasla
+
+endpoint do usuwania konta z powiazanymi danymi
+
+blokowanie usera przez usera do sprawdzenia
+dodanie usueniecia uzytkownikow z grupy
+
+dodanie dokumentacji ala swagger do api zeby wkleic screena do worda i opisac
+
+FRONTEND NOTATKI
+zamiana spa na pwa
