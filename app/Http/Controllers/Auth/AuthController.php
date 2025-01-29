@@ -66,7 +66,8 @@ class AuthController extends Controller
                 'last_name' => $user->last_name,
                 'email' => $user->email,
                 'photo' =>  $photoUrl,
-            ],
+                'role' => $user->getRoleNames()?->first()
+        ],
             'token' => $token,
         ], 200);
     }
