@@ -67,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
 //            ]);
 //        });
 
+
         Route::get('/swipe-data', [SwipeController::class, 'show']);
 
         Route::apiResource('blocks', BlockController::class)->except([
