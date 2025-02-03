@@ -39,6 +39,7 @@
         "APP_SERVICES_CACHE": "/tmp/services.php",
         "VIEW_COMPILED_PATH": "/tmp",
 
+        "DB_CONNECTION": "pgsql",
         "DB_URL": "postgres://default:d5Zmpcwn4aiX@ep-winter-mud-a4oiczci-pooler.us-east-1.aws.neon.tech/verceldb?sslmode=require",
 
         "BROADCAST_DRIVER": "pusher",
