@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "pusher/pusher-php-server": "^7.2",
+        "rakutentech/laravel-request-docs": "^2.41",
         "spatie/laravel-permission": "^6.10",
         "twilio/sdk": "^8.3"
     },

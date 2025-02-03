@@ -10,6 +10,8 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\Message\MessageController;
 use App\Http\Controllers\Swipe\SwipeController;
 use App\Http\Controllers\TwilioVideoController;
+use App\Http\Controllers\User\Ban\BanController;
+use App\Http\Controllers\User\Block\BlockController;
 use App\Http\Controllers\User\Conversation\ConversationController;
 use App\Http\Controllers\User\Conversation\UserGroupConversationController;
 use App\Http\Controllers\User\Detail\UserDetailController;
@@ -43,7 +45,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/photos', [UserProfilePhotoController::class, 'update']);
         Route::delete('/photos/{id}', [UserProfilePhotoController::class, 'destroy']);
 
-        Route::apiResource('conversations.messages',MessageController::class )->shallow(false);
+        Route::apiResource('conversations.messages',MessageController::class )
+            ->only([
+                'index',
+                'store'
+            ])
+            ->shallow(false);
 
 
         Route::apiResource('conversations', ConversationController::class)->only([
@@ -61,13 +68,23 @@ Route::middleware('auth:sanctum')->group(function () {
 //        });
 
         Route::get('/swipe-data', [SwipeController::class, 'show']);
-    });
 
+        Route::apiResource('blocks', BlockController::class)->except([
+            'update'
+        ]);
+
+        Route::post('/ban', [BanController::class, 'banUser']);
+        Route::post('/unban', [BanController::class, 'unbanUser']);
+
+
+//        Route::post('/blocks', [BlockController::class, 'blockUser']);        // Create a block (block user)
+//        Route::delete('/blocks/{blocked_id}', [BlockController::class, 'unblockUser']); // Delete a block (unblock user)
+
+    });
 
     Route::get('/matches', [MatchController::class, 'index']);
     Route::get('/matches/{id}', [MatchController::class, 'show']);
     Route::post('/users/{id}/report', [MatchController::class, 'report']);
-
 
     Route::apiResource('details', DetailController::class)->only([
         'index',
@@ -86,14 +103,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/swipes/matches', [SwipeController::class, 'getMatchedSwipes']);
 
     // Group conversations
-    Route::apiResource('groups', GroupConversationController::class);
+    Route::apiResource('groups', GroupConversationController::class)
+        ->except('update');
 
     // Group conversation users
     Route::prefix('/groups/{group}')->group(function () {
         Route::post('/users', [GroupConversationUserController::class, 'store']);
         Route::delete('/users', [GroupConversationUserController::class, 'destroy']);
 
-        Route::apiResource('messages', GroupConversationMessageController::class);
+        Route::apiResource('messages', GroupConversationMessageController::class)->only([
+            'index',
+            'store'
+        ]);
+
+        Route::patch('/name', [GroupConversationController::class, 'updateName']);
     });
 });
 

@@ -34,6 +34,7 @@ class User extends Authenticatable
         'email_verified_at',
         'role',
         'is_banned',
+        'banned_until',
         'city',
         'profession',
         'bio',
@@ -242,5 +243,26 @@ class User extends Authenticatable
         // Fetch the details and map them
         $details = $this->fetchDetails();
         return $this->mapDetails($details, $selectedDetailsIds);
+    }
+
+    public function blockedUsers()
+    {
+        return $this->hasMany(Block::class, 'blocker_id')->with('blocked');
+    }
+
+    public function blockedByUsers()
+    {
+        return $this->hasMany(Block::class, 'blocked_id')->with('blocker');
+    }
+
+    public function hasBlocked(User $user)
+    {
+        return $this->blockedUsers()->where('blocked_id', $user->id)->exists();
+    }
+
+
+    public function isBlockedBy(User $user)
+    {
+        return $this->blockedByUsers()->where('blocker_id', $user->id)->exists();
     }
 }

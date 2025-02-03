@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Rules\NotBanned;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register the custom validation rule
+        \Illuminate\Support\Facades\Validator::extend('not_banned', NotBanned::class);
     }
 }

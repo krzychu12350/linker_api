@@ -5,6 +5,7 @@ namespace App\Http\Controllers\GroupConversation;
 use App\Enums\ConversationType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GroupConversation\GroupConversationStoreRequest;
+use App\Http\Requests\GroupConversation\UpdateConversationNameRequest;
 use App\Http\Resources\ConversationResource;
 use App\Models\Conversation;
 use App\Models\User;
@@ -96,4 +97,37 @@ class GroupConversationController extends Controller
             'message' => 'Group conversation and related messages deleted successfully.',
         ], 200);
     }
+
+    /**
+     * Update the name of an existing conversation.
+     */
+    public function updateName(UpdateConversationNameRequest $request, $conversationId): JsonResponse
+    {
+        // Get the validated data
+        $validated = $request->validated();
+
+        // Find the conversation
+        $conversation = Conversation::find($conversationId);
+
+        // Check if the conversation exists
+        if (!$conversation) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Conversation not found.',
+            ], 404);
+        }
+
+        // Update the conversation name
+        $conversation->name = $validated['name'];
+        $conversation->save();
+
+        // Return the updated conversation as a response
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Conversation name updated successfully.',
+            'data' => $conversation,
+        ], 200);
+    }
 }
+
+

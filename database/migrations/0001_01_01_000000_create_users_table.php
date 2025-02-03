@@ -24,6 +24,8 @@ return new class extends Migration
 //            $table->enum('role', UserRole::values())->default(UserRole::USER->value);
 
             $table->boolean('is_banned')->default(false);
+//            $table->timestamp('banned_until')->nullable();
+
             $table->string('city')->nullable();
             $table->string('profession')->nullable();
             $table->text('bio')->nullable();
