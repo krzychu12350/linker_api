@@ -17,6 +17,7 @@ class Report extends Model
         'type',
         'status',
 //        'user_id'
+        'reported_user_id', // The reported user
     ];
 
     // Casting 'type' to the ReportType enum
@@ -43,4 +44,12 @@ class Report extends Model
             ->withTimestamps();
     }
 
+    /**
+     * Define the relationship between Report and the reported User
+     * A report belongs to a reported user.
+     */
+    public function reportedUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reported_user_id');
+    }
 }

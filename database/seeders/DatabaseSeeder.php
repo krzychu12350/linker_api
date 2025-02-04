@@ -6,6 +6,7 @@ use App\Models\Report;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,10 +15,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-//        User::factory(20)->withRole('user')->create();
-//        User::factory(20)->withRole('moderator')->create();
-
-        Report::factory(20)->create();
 //        User::factory()->create([
 //            'name' => 'Test User',
 //            'email' => 'test@example.com',
@@ -26,5 +23,15 @@ class DatabaseSeeder extends Seeder
 //           RolesAndPermissionsSeeder::class,
 //            UserDetailSeeder::class,
 //        ]);
+//
+//        User::factory(20)->withRole('user')->create();
+//        User::factory(20)->withRole('moderator')->create();
+        User::factory(1)->withRole('user')->create([
+            'first_name' => 'Test',
+            'last_name' => 'Test',
+            'email' => 'TEST@TEST.PL',
+            'password' => Hash::make('securepassword123')
+        ]);
+        ///Report::factory(20)->create();
     }
 }

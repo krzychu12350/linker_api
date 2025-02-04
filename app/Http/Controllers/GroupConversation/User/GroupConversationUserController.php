@@ -46,8 +46,9 @@ class GroupConversationUserController extends Controller
         ], 200);
     }
 
+
     /**
-     * Remove multiple users from a specific group conversation.
+     * Remove multiple users from a specific group conversation and assign admin privilege to a random user if an admin is removed.
      */
     public function destroy(GroupConversationUserRequest $request, Conversation $group): JsonResponse
     {
@@ -73,12 +74,32 @@ class GroupConversationUserController extends Controller
             ], 404);
         }
 
+        // Check if the admin is among the removable users
+        $adminUserIds = $group->users()->where('is_admin', true)->pluck('user_id')->toArray();
+        $adminRemoved = !empty(array_intersect($removableUserIds, $adminUserIds));
+
+        // If an admin is removed, assign admin privilege to a random user
+        if ($adminRemoved) {
+            // Get remaining users in the group
+            $remainingUsers = $group->users()->whereNotIn('user_id', $removableUserIds)->pluck('user_id')->toArray();
+
+            // Ensure there are still users remaining in the group
+            if (count($remainingUsers) > 0) {
+                // Select a random user to be the new admin
+                $randomUserId = $remainingUsers[array_rand($remainingUsers)];
+
+                // Assign the admin privilege to the selected random user
+                $group->users()->updateExistingPivot($randomUserId, ['is_admin' => true]);
+            }
+        }
+
         // Remove the users from the conversation
         $group->users()->detach($removableUserIds);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Users removed from the conversation successfully.',
+            'message' => 'Users removed from the conversation, and admin privilege assigned if necessary.',
         ], 200);
     }
+
 }

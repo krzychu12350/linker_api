@@ -38,10 +38,10 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
-    Route::prefix('/social')->group(function () {
-        Route::post('/register', [SocialAuthController::class, 'register']);
-        Route::post('/login', [SocialAuthController::class, 'login']);
-    });
+//    Route::prefix('/social')->group(function () {
+//        Route::post('/register', [SocialAuthController::class, 'register']);
+//        Route::post('/login', [SocialAuthController::class, 'login']);
+//    });
 
     Route::prefix('/password/reset')->group(function () {
         Route::post('/email', [PasswordResetController::class, 'sendPasswordResetEmail']);
@@ -130,6 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('swipes', SwipeController::class)->only([
         'index',
         'store',
+        'destroy'
     ]);
 
     Route::get('/swipes/matches', [SwipeController::class, 'getMatchedSwipes']);
@@ -149,6 +150,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
 
         Route::patch('/name', [GroupConversationController::class, 'updateName']);
+        Route::patch('/admin', [GroupConversationController::class, 'updateAdmin']);
 
         Route::apiResource('events', EventController::class)->except([
             'update',

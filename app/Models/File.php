@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FileExtension;
 use App\Enums\FileType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,12 +23,14 @@ class File extends Model
     // Specify the fillable attributes for mass assignment
     protected $fillable = [
         'url', // The URL of the image
-        'type'
+        'type',
+        'extension',
     ];
 
 
     protected $casts = [
         'type' => FileType::class,
+        'extension' => FileExtension::class,
     ];
 
     /**

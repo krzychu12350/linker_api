@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
+use App\Models\Detail; // Assuming you have a Detail model
 
 class StoreUserPreferencesRequest extends FormRequest
 {
@@ -21,16 +23,18 @@ class StoreUserPreferencesRequest extends FormRequest
      */
     public function rules(): array
     {
-        // add validation for detail preferences could be only details without parent_id!!!
         return [
-            'details' => 'required|array', // Ensure the 'details' field is an array
-            'details.*' => 'exists:details,id', // Ensure each detail ID is valid
-            'age_range_start' => 'nullable|integer|min:1', // Validate age_range_start
-            'age_range_end' => 'nullable|integer|min:1|gte:age_range_start', // Validate age_range_end and it must be greater than or equal to age_range_start
-            'height' => 'nullable|integer|min:1', // Validate height
+            'details' => 'required|array',
+            'details.*' => 'exists:details,id',
+            'age_range_start' => 'nullable|integer|min:1',
+            'age_range_end' => 'nullable|integer|min:1|gte:age_range_start',
+            'height' => 'nullable|integer|min:1',
         ];
     }
 
+    /**
+     * Custom error messages.
+     */
     public function messages()
     {
         return [
@@ -38,5 +42,26 @@ class StoreUserPreferencesRequest extends FormRequest
             'details.*.exists' => 'Selected preference must be a valid detail.',
             'age_range_end.gte' => 'Age range end must be greater than or equal to the start.',
         ];
+    }
+
+    /**
+     * Add custom validation after default validation.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($this->has('details')) {
+                $details = $this->input('details');
+
+                $invalidDetails = Detail::whereIn('id', $details)
+                    ->whereNotNull('parent_id')
+                    ->pluck('id')
+                    ->toArray();
+
+                if (!empty($invalidDetails)) {
+                    $validator->errors()->add('details', 'Selected preferences cannot be associated with a parent.');
+                }
+            }
+        });
     }
 }

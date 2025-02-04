@@ -7,7 +7,6 @@ use App\Http\Requests\Auth\SocialRegisterRequest;
 use App\Strategies\AuthenticationStrategy\AuthStrategy;
 use App\Strategies\AuthenticationStrategy\SocialAuthStrategy;
 use App\Http\Controllers\Controller;
-use Google\Client;
 use Illuminate\Http\JsonResponse;
 
 class SocialAuthController extends Controller
@@ -17,7 +16,7 @@ class SocialAuthController extends Controller
     // Constructor to inject the SocialAuthStrategy
     public function __construct()
     {
-        $this->authStrategy = new SocialAuthStrategy();  // Use Social Auth Strategy
+        $this->authStrategy = new SocialAuthStrategy();
     }
 
     public function login(SocialLoginRequest $request): JsonResponse

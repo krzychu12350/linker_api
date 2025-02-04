@@ -44,6 +44,7 @@ class ReportController extends Controller
             'description' => $request->description,
             'type' => $request->type,
             'status' => ReportStatus::WAITING->value, // Default status is 'WAITING'
+            'reported_user_id' => $request->reported_user_id,
         ]);
 
         // Handle file upload if it exists

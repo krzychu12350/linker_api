@@ -24,6 +24,7 @@ class GroupConversationStoreRequest extends FormRequest
         return [
             //'type' => 'required|in:user,group', // Ensure type is valid (user or group)
             'name' => 'nullable|string|max:255', // Optional for group conversations
+            'admin_id' =>  'exists:users,id',
             'user_ids' => 'required|array|min:2', // Ensure at least one user ID is provided
             'user_ids.*' => 'exists:users,id', // Ensure each user ID exists in the users table
         ];

@@ -27,6 +27,9 @@ return new class extends Migration
 
             // Foreign key to users table
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+
+            // Foreign key to reported users table
+            $table->foreignId('reported_user_id')->constrained('users')->cascadeOnDelete();
         });
     }
 

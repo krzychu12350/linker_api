@@ -25,11 +25,15 @@ class ReportFactory extends Factory
      */
     public function definition(): array
     {
+        $userId = $this->getRandomUserId();
+        $reportedUserId = $this->getRandomReportedUserId($userId);
+
         return [
             'description' => $this->faker->paragraph(),
             'type' => $this->faker->randomElement(ReportType::values()),
             'status' => $this->faker->randomElement(ReportStatus::values()),
-            'user_id' => $this->getRandomUserId(),  // Assign existing user with role 'user'
+            'user_id' => $userId,
+            'reported_user_id' => $reportedUserId,
         ];
     }
 
@@ -39,6 +43,14 @@ class ReportFactory extends Factory
     private function getRandomUserId(): ?int
     {
         return User::role('user')->inRandomOrder()->value('id');
+    }
+
+    /**
+     * Get a random reported user ID that is different from the given user ID.
+     */
+    private function getRandomReportedUserId(int $userId): ?int
+    {
+        return User::role('user')->where('id', '!=', $userId)->inRandomOrder()->value('id');
     }
 
     /**

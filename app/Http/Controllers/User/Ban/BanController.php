@@ -23,10 +23,10 @@ class BanController extends Controller
 
         if ($request->ban_type === BanType::TEMPORARY->value) {
             // Calculate the duration for a temporary ban
-            $banUntil = Carbon::now()->addDays($request->duration);
+            //$banUntil = Carbon::now()->addDays($request->duration);
             $user->update([
                 'is_banned' => true,
-                'banned_until' => $banUntil
+                'banned_until' => $request->duration
             ]);
         } else {
             // Permanent ban

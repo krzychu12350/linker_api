@@ -36,10 +36,11 @@ class MatchedSwipeResource extends JsonResource
 //            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/" .
             $secondUserPhotos->first()->url;
 
-
+//        dd($this->resource);
         return [
 //            'user' => [
-            'swipe_id' => $secondUser->id,
+            'id' => $this->id,
+            'user_id' => $secondUser->id,
             'conversation_id' => $conversation->id,
             'first_name' => $secondUser->first_name,
             'last_name' => $secondUser->last_name,

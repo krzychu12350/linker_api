@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\FileExtension;
 use App\Enums\FileType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('url');
             $table->enum('type', FileType::values());
+            $table->enum('extension', FileExtension::values())->nullable();
             $table->timestamps();
         });
 

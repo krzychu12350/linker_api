@@ -1,12 +1,9 @@
 <?php
 
-// app/Http/Requests/User/Ban/BanUserRequest.php
-
 namespace App\Http\Requests\User\Ban;
 
 use App\Enums\BanType;
 use Illuminate\Foundation\Http\FormRequest;
-use Spatie\Permission\Models\Role;
 
 class BanUserRequest extends FormRequest
 {
@@ -15,8 +12,8 @@ class BanUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Check if the authenticated user has 'admin' or 'moderator' role
-        return auth()->user()->hasAnyRole(['admin', 'moderator']);
+        //return auth()->user()->hasRole('admin');
+        return true;
     }
 
     /**
@@ -28,7 +25,7 @@ class BanUserRequest extends FormRequest
     {
         return [
             'ban_type' => 'required|in:' . implode(',', BanType::values()), // Ensure ban_type is valid
-            'duration' => 'required_if:ban_type,temporary|integer|min:1', // Required if the ban type is temporary
+            'duration' => 'required_if:ban_type,temporary|date|after:now', // Ensure it's a valid future date
         ];
     }
 
@@ -37,6 +34,8 @@ class BanUserRequest extends FormRequest
         return [
             'ban_type.in' => 'The selected ban type is invalid.',
             'duration.required_if' => 'Duration is required if the ban type is temporary.',
+            'duration.date' => 'The duration must be a valid date.',
+            'duration.after' => 'The duration must be a future date and time.',
         ];
     }
 }

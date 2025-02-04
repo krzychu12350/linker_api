@@ -11,4 +11,6 @@ enum BanType: int
     case TEMPORARY = 1;
     case PERMANENT = 2;
 
+    case NON_BANNED = 3;
+
 }

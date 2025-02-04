@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\BanType;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -306,5 +308,57 @@ class User extends Authenticatable
     public function linkedSocialAccounts()
     {
         return $this->hasOne(LinkedSocialAccount::class);
+    }
+
+
+    /**
+     * Check if the user is banned, either permanently or temporarily.
+     *
+     * @return BanType
+     */
+    public function banType(): BanType
+    {
+        // Check if the user is banned permanently
+        if ($this->isPermanentlyBanned()) {
+            return BanType::PERMANENT;
+        }
+
+        // Check if the user is banned temporarily
+        if ($this->isTemporarilyBanned()) {
+            return BanType::TEMPORARY;
+        }
+
+        return BanType::NON_BANNED;
+    }
+
+    /**
+     * Determine if the user is permanently banned.
+     *
+     * @return bool
+     */
+    public function isPermanentlyBanned(): bool
+    {
+        return $this->is_banned && !$this->banned_until;
+    }
+
+    /**
+     * Determine if the user is temporarily banned.
+     *
+     * @return bool
+     */
+    public function isTemporarilyBanned(): bool
+    {
+        return $this->is_banned && $this->banned_until && Carbon::now()->lessThanOrEqualTo($this->banned_until);
+    }
+
+    /**
+     * Find a user by their email address.
+     *
+     * @param string $email
+     * @return \App\Models\User|null
+     */
+    public static function findByEmail(string $email): ?User
+    {
+        return self::where('email', $email)->first();
     }
 }

@@ -25,6 +25,7 @@ class StoreReportRequest extends FormRequest
         return [
             'description' => 'required|string|max:1000',
             'type' => 'required|in:' . implode(',', ReportType::values()),
+            'reported_user_id' => 'required|exists:users,id',
             'files' => 'nullable|array', // The files field is optional
             'files.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120', // Max file size 5MB, can upload jpg, jpeg, png, pdf, doc, and docx
         ];

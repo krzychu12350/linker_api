@@ -13,9 +13,11 @@ use App\Models\ConversationUser;
 use App\Models\Swipe;
 use App\Models\SwipeMatch;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Services\UserInterestService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SwipeController extends Controller
 {
@@ -181,12 +183,27 @@ class SwipeController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified swipe match from storage.
      */
-    public function destroy(string $id)
+    public function destroy(int $id): JsonResponse
     {
-        //
+        $swipeMatch = SwipeMatch::findOrFail($id);
+
+        // Get the authenticated user
+        $user = auth()->user();
+
+        // Check if the user is involved in this swipe match
+        if ($swipeMatch->swipe_id_1 == $user->id || $swipeMatch->swipe_id_2 == $user->id) {
+            // Delete the swipe match
+            $swipeMatch->delete();
+
+            return response()->json(['message' => 'Swipe match deleted successfully.'], 204);
+        }
+
+        // If the user is not part of this swipe match
+        return response()->json(['message' => 'You do not have permission to delete this swipe match.'], 403);
     }
+
 
     public function getMatchedSwipes(): AnonymousResourceCollection
     {
