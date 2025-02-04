@@ -30,7 +30,8 @@ class Conversation extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'conversation_user');
+        return $this->belongsToMany(User::class, 'conversation_user')
+            ->withPivot('is_admin'); // Ensure pivot data is loaded
     }
 
     /**

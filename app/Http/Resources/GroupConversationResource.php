@@ -2,8 +2,12 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\ConversationType;
+use App\Http\Resources\GroupConversation\Users\UserGroupResource;
 use App\Http\Resources\User\UserResource;
-use App\Http\Resources\GroupConversation\Event\EventResource; // You may need to create this
+use App\Http\Resources\GroupConversation\Event\EventResource;
+
+// You may need to create this
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,11 +20,17 @@ class GroupConversationResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+//        dd($this->type === ConversationType::GROUP);
         return [
             'id' => $this->id,
             'name' => $this->name,
             'last_message' => new MessageResource($this->messages->last()),
-            'users' => UserResource::collection($this->users),
+            'users' => UserGroupResource::collection($this->users),
+//            'users' => $this->users->map(function ($user) {
+//                return new UserGroupResource($user, [
+//                    'is_admin' => $user->pivot->is_admin,
+//                ]);
+//            }),
             'events' => $this->events->map(function ($event) {
                 // Map events to include their grouped votes
                 return [

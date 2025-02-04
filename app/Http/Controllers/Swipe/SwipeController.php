@@ -13,15 +13,18 @@ use App\Models\ConversationUser;
 use App\Models\Swipe;
 use App\Models\SwipeMatch;
 use App\Models\User;
+use App\Services\SwipeFilterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Services\UserInterestService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SwipeController extends Controller
 {
-    public function __construct(private readonly UserInterestService $userInterestService)
+    public function __construct(
+        private readonly UserInterestService $userInterestService,
+        private readonly SwipeFilterService  $swipeFilterService,
+    )
     {
     }
 
@@ -31,22 +34,35 @@ class SwipeController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $userId = $user->id;
 
-        $users = User::with(['photos'])
-            ->where('id', '!=', $userId) // Exclude current user
-            ->whereNotIn('id', function ($query) use ($userId) {
-                $query->select('swipe_id_2')
-                    ->from('swipe_matches')
-                    ->where('swipe_id_1', $userId)
-                    ->union(
-                        SwipeMatch::select('swipe_id_1')
-                            ->where('swipe_id_2', $userId)
-                    );
-            })
-            ->get();
+        // Use the builder pattern to filter users
+        $users = $this->swipeFilterService
+            ->initialize($user)                // Initialize the query with the base conditions
+            ->filterByPreferenceData($user)     // Filter by preference data (age, height)
+            ->filterByDetailPreferences($user) // Filter by detail preferences
+            ->excludeMatchedUsers($user)       // Exclude already matched users
+            ->get();                           // Get the final filtered users
 
         return SwipeResource::collection($users);
+
+        //old
+//        $user = auth()->user();
+//        $userId = $user->id;
+//
+//        $users = User::with(['photos'])
+//            ->where('id', '!=', $userId) // Exclude current user
+//            ->whereNotIn('id', function ($query) use ($userId) {
+//                $query->select('swipe_id_2')
+//                    ->from('swipe_matches')
+//                    ->where('swipe_id_1', $userId)
+//                    ->union(
+//                        SwipeMatch::select('swipe_id_1')
+//                            ->where('swipe_id_2', $userId)
+//                    );
+//            })
+//            ->get();
+//
+//        return SwipeResource::collection($users);
     }
 
 
