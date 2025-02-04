@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'google' => [
+        'client_id' => '1078774043263-sk7njaf8md9672m9f5oq0kt3csjcdosg.apps.googleusercontent.com',
+        'client_secret' => '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',
+        'redirect' => 'http://localhost:5173/callback',
+    ],
 ];

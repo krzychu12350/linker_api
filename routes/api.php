@@ -1,9 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Detail\DetailController;
+use App\Http\Controllers\GroupConversation\Event\EventController;
+use App\Http\Controllers\GroupConversation\Event\Vote\EventVoteController;
 use App\Http\Controllers\GroupConversation\GroupConversationController;
 use App\Http\Controllers\GroupConversation\Message\GroupConversationMessageController;
 use App\Http\Controllers\GroupConversation\User\GroupConversationUserController;
@@ -33,11 +37,18 @@ Route::get('/user', function (Request $request) {
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+    Route::prefix('/social')->group(function () {
+        Route::post('/register', [SocialAuthController::class, 'register']);
+        Route::post('/login', [SocialAuthController::class, 'login']);
+    });
+
     Route::prefix('/password/reset')->group(function () {
         Route::post('/email', [PasswordResetController::class, 'sendPasswordResetEmail']);
         Route::post('', [PasswordResetController::class, 'resetPassword']);
     });
+
+    Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 });
 
 // ROLE COMMON USER
@@ -138,6 +149,16 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
 
         Route::patch('/name', [GroupConversationController::class, 'updateName']);
+
+        Route::apiResource('events', EventController::class)->except([
+            'update',
+            'destroy',
+        ]);
+
+        Route::apiResource('events.votes', EventVoteController::class)->except([
+            'update',
+            'destroy',
+        ]);
     });
 
 
@@ -163,6 +184,9 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('admin.reports.update.status');
 
         //User management
+        Route::apiResource('users', AdminUserController::class);
+        Route::post('users/{user}/ban', [AdminUserController::class, 'ban']);
+        Route::post('users/{user}/unban', [AdminUserController::class, 'unban']);
     });
 
 

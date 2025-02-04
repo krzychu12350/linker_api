@@ -66,4 +66,12 @@ class Conversation extends Model
         return $this->messages()->orderBy('created_at')->first();
     }
 
+    /**
+     * Relationship: Get all events related to this conversation.
+     */
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
 }

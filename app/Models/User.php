@@ -302,4 +302,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class);
     }
+
+    public function linkedSocialAccounts()
+    {
+        return $this->hasOne(LinkedSocialAccount::class);
+    }
 }

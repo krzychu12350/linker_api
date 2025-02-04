@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\GroupConversation\Event;
 
+use App\Enums\PollResponse;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
-class LoginRequest extends FormRequest
+class StoreEventVoteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +24,11 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email',
-            'password' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+            'response' => [
+                'required',
+                new Enum(PollResponse::class)
+            ]
         ];
     }
 }
