@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ReportStatus;
 use App\Enums\ReportType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,6 +19,8 @@ return new class extends Migration
 
             // Using ReportType::cases() to get the enum values
             $table->enum('type', ReportType::values());
+
+            $table->enum('status', ReportStatus::values());
 
 //            $table->unsignedBigInteger('user_id');
             $table->timestamps(); // created_at and updated_at

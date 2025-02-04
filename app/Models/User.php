@@ -4,6 +4,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -264,5 +267,39 @@ class User extends Authenticatable
     public function isBlockedBy(User $user)
     {
         return $this->blockedByUsers()->where('blocker_id', $user->id)->exists();
+    }
+
+    // Relationship to user details (preferences)
+    public function detailPreferences(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Detail::class,
+            'user_detail_preference',
+            'user_id',
+            'detail_id'
+        );
+    }
+
+
+    // Relationship to user preference data (age, height, etc.)
+    public function preferenceData(): HasOne
+    {
+        return $this->hasOne(UserDataPreference::class, 'user_id', 'id');
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param string $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+//        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class);
     }
 }

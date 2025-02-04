@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers\User\Report;
+
+use App\Enums\ReportStatus;
+use App\Helpers\FileTypeHelper;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\User\Report\StoreReportRequest;
+use App\Models\File;
+use App\Models\Report;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
+class ReportController extends Controller
+{
+    /**
+     * Display a listing of the user's reports with their associated files.
+     */
+    public function index()
+    {
+        $user = Auth::user();
+
+        // Fetch reports with related files using Eager Loading
+        $reports = $user->reports()
+            ->with('files') // Eager load associated files
+            ->latest()      // Order by the most recent reports
+            ->paginate(10); // Paginate the results (10 per page)
+
+        return response()->json([
+            'message' => 'Reports fetched successfully!',
+            'data' => $reports,
+        ]);
+    }
+
+    /**
+     * Store a new report created by the user.
+     */
+    public function store(StoreReportRequest $request, User $user)
+    {
+        $user = Auth::user();
+
+        // Create a new report
+        $report = $user->reports()->create([
+            'description' => $request->description,
+            'type' => $request->type,
+            'status' => ReportStatus::WAITING->value, // Default status is 'WAITING'
+        ]);
+
+        // Handle file upload if it exists
+        if ($request->hasFile('files')) {
+            $fileIds = [];
+
+            // Loop through all uploaded files
+            foreach ($request->file('files') as $file) {
+                $fileType = FileTypeHelper::getFileType($file); // Determine the file type
+
+                // Upload file to Cloudinary
+                $uploadedFile = cloudinary()->upload($file->getRealPath(), [
+                    'resource_type' => 'auto',
+                    'folder' => 'reports',
+                ]);
+
+                // Create a new File record in the database
+                $fileRecord = File::create([
+                    'url' => $uploadedFile->getSecurePath(),
+                    'type' => $fileType,
+                ]);
+
+                $fileIds[] = $fileRecord->id;
+            }
+
+            // Associate the uploaded files with the created report
+            $report->files()->attach($fileIds);
+        }
+
+        return response()->json([
+            'message' => 'Report submitted successfully!',
+            'data' => $report,
+        ], 201);
+    }
+}
