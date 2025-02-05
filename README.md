@@ -35,7 +35,7 @@ zamiana spa na pwa
 zostalo
 1. odfiltrowanie w swipach po preferencjach V
 2. poprawa walidacja preferencji (szczegółów) moga przychodzic tylko detale, ktore nie maja parenta V
-3. dodać w rejestracji/logowaniu czy ktoś nie ma permanentnie zbanowanego konta
+3. dodać w rejestracji/logowaniu7 czy ktoś nie ma permanentnie zbanowanego konta
 4. obsługa sytuacja jak ktoś ma czasowo zbanowane konto to jest zwracane info ile jeszcze czasu ma zbanowane V
 5. dodanie powiadomien do bazy jak zostanie podjęta decyzja odnośnie zgłoszenia i ztriggerowanie pushera i ta sama sytuacja przy dodanie eventu/głosu
 6. przy dodaniu moderatora przychodzi email potwierdzeniem konta i potem haslem startowym

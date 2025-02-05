@@ -361,4 +361,32 @@ class User extends Authenticatable
     {
         return self::where('email', $email)->first();
     }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function banUser(int $banType, $bannedUntil): void
+    {
+        if ($banType == BanType::TEMPORARY->value) {
+            // Calculate the duration for a temporary ban
+            //$banUntil = Carbon::now()->addDays($request->duration);
+            $this->update([
+                'is_banned' => true,
+                'banned_until' => $bannedUntil
+            ]);
+        } else {
+            // Permanent ban
+            $this->update([
+                'is_banned' => true,
+                'banned_until' => null
+            ]);
+        }
+    }
 }

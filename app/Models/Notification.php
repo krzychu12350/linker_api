@@ -18,7 +18,7 @@ class Notification extends Model
         'message',
         'status',
         'type',
-        'user_id',
+        //'user_id',
     ];
 
     // Define the relationship to the User model

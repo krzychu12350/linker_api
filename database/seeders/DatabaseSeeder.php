@@ -25,13 +25,20 @@ class DatabaseSeeder extends Seeder
 //        ]);
 //
 //        User::factory(20)->withRole('user')->create();
-//        User::factory(20)->withRole('moderator')->create();
-        User::factory(1)->withRole('user')->create([
-            'first_name' => 'Test',
-            'last_name' => 'Test',
-            'email' => 'TEST@TEST.PL',
-            'password' => Hash::make('securepassword123')
-        ]);
-        ///Report::factory(20)->create();
+//       // User::factory(20)->withRole('moderator')->create();
+//        User::factory(1)->withRole('user')->create([
+//            'first_name' => 'Test',
+//            'last_name' => 'Test',
+//            'email' => 'TEST@TEST.pl',
+//            'password' => Hash::make('securepassword123')
+//        ]);
+//        User::factory(1)->withRole('user')->create([
+//            'first_name' => 'Test2',
+//            'last_name' => 'Test2',
+//            'email' => 'TEST2@TEST.pl',
+//            'password' => Hash::make('securepassword123')
+//        ]);
+
+        Report::factory(20)->create();
     }
 }

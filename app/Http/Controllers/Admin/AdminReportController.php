@@ -2,13 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\BanType;
+use App\Enums\NotificationType;
+use App\Helpers\Pusher;
+use App\Http\Requests\Admin\Report\UpdateReportStatusRequest;
+use App\Models\Notification;
 use App\Models\Report;
 use App\Enums\ReportStatus;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class AdminReportController extends Controller
 {
+    public function __construct(private readonly Pusher $pusher)
+    {
+    }
+
     /**
      * Fetch reports with pagination.
      */
@@ -40,15 +50,45 @@ class AdminReportController extends Controller
     /**
      * Update the status of a report.
      */
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(UpdateReportStatusRequest $request, int $id): JsonResponse
     {
-        $request->validate([
-            'status' => 'required|in:' . implode(',', ReportStatus::values()),
-        ]);
+        //ACCEPTED
+        // 1. jesli status jest accepted to wymaga zablokowania uzytkownika stale albo tymczasowo
+        // 2. dodanie notyfikacji do bazy 'wiadomosc', status unread i przypisanie to do obecnego usera
+        // 3. trigger eventu pushera z przekazaniem danych tej notyfikacji, ze zablokowany i na ile
+
+        //REJECTED
+        // 2. dodanie notyfikacji do bazy 'wiadomosc', status unread i przypisanie to do obecnego usera
+        // 3. trigger eventu pushera z przekazaniem danych tej notyfikacji, ze odrzucone
+
+        $message = '';
+
+        $validated = $request->validated();
 
         $report = Report::findOrFail($id);
-        $report->status = $request->status;
-        $report->save();
+
+        if ($validated ['status'] == ReportStatus::ACCEPTED->value) {
+            $report->reportedUser->banUser($validated ['ban_type'], $validated ['banned_until']);
+            $message = 'The report was accepted. User ' . $report->reportedUser->first_name . ' ' . $report->reportedUser->last . 'has been banned!';
+        }
+
+        if ($validated ['status'] == ReportStatus::REJECTED->value) {
+            $message = 'The report was rejected. User ' . $report->reportedUser->first_name . ' ' . $report->reportedUser->last . 'has not been banned!';
+        }
+
+        $report->update([
+            'status' => $validated['status']
+        ]);
+
+        $notification = $report->user->notifications()->create([
+            'message' => $message,
+            'type' => NotificationType::MATCH,
+        ]);
+
+//        dd($notification->user->id);
+      // dd($notification->toArray());
+        $channel = 'notifications.user' .  $report->user->id;
+        $this->pusher->triggerAsync($channel, 'notification.added',  $notification->toArray());
 
         return response()->json([
             'message' => 'Report status updated successfully!',

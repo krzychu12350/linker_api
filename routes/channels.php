@@ -28,3 +28,7 @@ Broadcast::channel('conversation.{conversation_id}', function ($user, $conversat
     return true;
 });
 
+Broadcast::channel('notifications.user.{user_id}', function ($user, $userId) {
+    return true;
+});
+

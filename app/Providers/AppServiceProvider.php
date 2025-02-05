@@ -2,7 +2,8 @@
 
 namespace App\Providers;
 
-use App\Rules\NotBanned;
+use App\Helpers\Pusher;
+//use App\Rules\NotBanned;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -12,7 +13,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(Pusher::class, function () {
+            return new Pusher();
+        });
     }
 
     /**

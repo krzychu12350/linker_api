@@ -10,7 +10,8 @@ class Event extends Model
     protected $fillable = [
         'title',
         'description',
-        'time'
+        'time',
+        'user_id',
     ];
 
     public function conversation()
@@ -21,6 +22,11 @@ class Event extends Model
     public function polls()
     {
         return $this->hasMany(EventPoll::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

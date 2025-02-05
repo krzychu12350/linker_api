@@ -25,6 +25,7 @@ class StoreEventRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'time' => 'required|date|after:now',
+            'user_id' => 'required|exists:users,id',
         ];
     }
 }

@@ -15,12 +15,14 @@ return new class extends Migration {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('conversation_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('title');
             $table->text('description')->nullable();
             $table->timestamp('time');
             $table->timestamps();
 
             $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         Schema::create('event_polls', function (Blueprint $table) {
