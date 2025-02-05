@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\BanType;
+use App\Enums\ConversationType;
+use App\Enums\MessageType;
 use App\Enums\NotificationType;
 use App\Helpers\Pusher;
 use App\Http\Requests\Admin\Report\UpdateReportStatusRequest;
+use App\Http\Resources\FileResource;
 use App\Models\Notification;
 use App\Models\Report;
 use App\Enums\ReportStatus;
@@ -85,10 +88,10 @@ class AdminReportController extends Controller
             'type' => NotificationType::MATCH,
         ]);
 
-//        dd($notification->user->id);
-      // dd($notification->toArray());
-        $channel = 'notifications.user' .  $report->user->id;
-        $this->pusher->triggerAsync($channel, 'notification.added',  $notification->toArray());
+        //  dd($notification->user->id);
+        // dd($notification->toArray());
+        $channel = 'notifications.user.' . $notification->user->id;
+        $this->pusher->triggerAsync($channel, 'notification.added', $notification->toArray());
 
         return response()->json([
             'message' => 'Report status updated successfully!',

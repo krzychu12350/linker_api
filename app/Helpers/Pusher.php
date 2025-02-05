@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise\PromiseInterface;
 use Pusher\Pusher as PusherClient;
 use Pusher\PusherException;
 
@@ -37,15 +38,17 @@ class Pusher
      * @param array|string $channels
      * @param string $event
      * @param array $data
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return PromiseInterface
      */
-    public function triggerAsync(array|string $channels, string $event, array $data)
+    public function triggerAsync(array|string $channels, string $event, array $data): void
     {
         $promise = $this->pusher->triggerAsync($channels, $event, $data);
 
-        return $promise->then(function ($result) {
+        $promise->then(function ($result) {
             return $result;
         });
+
+        $promise->wait();
     }
 
     /**

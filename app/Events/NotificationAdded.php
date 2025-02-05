@@ -37,7 +37,8 @@ class NotificationAdded implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('notifications.user.' . $this->user?->id),
+            new Channel('notifications.user.' . $this->notification->user?->id),
+//            new Channel('notifications.user'),
 //            new PrivateChannel(
 //                'conversation.' . $this->message->conversation()->first()?->id
 //            ),
