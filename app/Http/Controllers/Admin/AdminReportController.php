@@ -12,13 +12,14 @@ use App\Http\Resources\FileResource;
 use App\Models\Notification;
 use App\Models\Report;
 use App\Enums\ReportStatus;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class AdminReportController extends Controller
 {
-    public function __construct(private readonly Pusher $pusher)
+    public function __construct(private readonly NotificationService $notificationService)
     {
     }
 
@@ -83,15 +84,10 @@ class AdminReportController extends Controller
             'status' => $validated['status']
         ]);
 
-        $notification = $report->user->notifications()->create([
-            'message' => $message,
-            'type' => NotificationType::MATCH,
-        ]);
-
-        //  dd($notification->user->id);
-        // dd($notification->toArray());
-        $channel = 'notifications.user.' . $notification->user->id;
-        $this->pusher->triggerAsync($channel, 'notification.added', $notification->toArray());
+        $this->notificationService->addNotification(
+            $report->user,
+            $message
+        );
 
         return response()->json([
             'message' => 'Report status updated successfully!',

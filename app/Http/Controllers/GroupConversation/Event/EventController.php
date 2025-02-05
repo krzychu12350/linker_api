@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers\GroupConversation\Event;
 
+use App\Enums\NotificationType;
+use App\Helpers\Pusher;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GroupConversation\Event\StoreEventRequest;
 use App\Models\Conversation;
 use App\Models\Event;
+use App\Services\NotificationService;
 
 class EventController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Get a list of events for a particular conversation.
      *
-     * @param  \App\Models\Conversation  $group
+     * @param \App\Models\Conversation $group
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Conversation $group)
@@ -43,6 +50,12 @@ class EventController extends Controller
     public function store(StoreEventRequest $request, Conversation $group)
     {
         $event = $group->events()->create($request->validated());
+
+        /// dd($event->user);
+        $this->notificationService->addNotification(
+            $event->user,
+            'User ' . $event->user->first_name . ' ' . $event->user->last_name . ' added event: ' . $event->title
+        );
 
         return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
     }
