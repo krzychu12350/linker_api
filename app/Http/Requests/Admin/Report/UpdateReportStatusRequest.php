@@ -24,7 +24,12 @@ class UpdateReportStatusRequest extends FormRequest
         return [
             'status' => 'required|in:' . implode(',', ReportStatus::values()),
             'ban_type' => 'required_if:status,1|in:' . implode(',', BanType::values()),
-            'banned_until' => 'required_if:ban_type,temporary|date|after:today',
+            'banned_until' => [
+                'nullable',                     // Allows empty value or null
+                'required_if:ban_type,1',        // Required if `ban_type` is 1
+                'date_format:Y-m-d H:i:s',       // Validates the date format "YYYY-MM-DD HH:MM:SS"
+                'after:today',                   // Ensures the date is after today (if provided)
+            ],
         ];
     }
 
