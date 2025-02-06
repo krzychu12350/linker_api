@@ -16,9 +16,9 @@ class AdminUserController extends Controller
     /**
      * Display a listing of the moderators.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $moderators = User::role('moderator')->paginate(10);
+        $moderators = User::role('moderator')->paginate($request->per_page ?? 10);
         return response()->json($moderators);
     }
 

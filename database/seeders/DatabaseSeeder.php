@@ -24,8 +24,8 @@ class DatabaseSeeder extends Seeder
 //            UserDetailSeeder::class,
 //        ]);
 //
-//        User::factory(20)->withRole('user')->create();
-//       // User::factory(20)->withRole('moderator')->create();
+////        User::factory(20)->withRole('user')->create();
+//        User::factory(20)->withRole('moderator')->create();
 //        User::factory(1)->withRole('user')->create([
 //            'first_name' => 'Test',
 //            'last_name' => 'Test',
@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
 //            'email' => 'TEST2@TEST.pl',
 //            'password' => Hash::make('securepassword123')
 //        ]);
-
-        Report::factory(20)->create();
+//
+        Report::factory(8)->create();
     }
 }

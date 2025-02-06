@@ -95,7 +95,7 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'schema'   => 'public',
-            'sslmode'  => 'require',
+            'sslmode' => env('DB_SSLMODE', 'disable'),
             'options'  => [
                 PDO::ATTR_PERSISTENT => true,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

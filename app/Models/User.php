@@ -76,6 +76,13 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Ensure the 'role' attribute is always included in the model's array and JSON representation.
+     *
+     * @var array
+     */
+    protected $appends = ['role'];
+
     // Define the relationship to the images table (Many-to-Many)
     public function photos()
     {
@@ -388,5 +395,26 @@ class User extends Authenticatable
                 'banned_until' => null
             ]);
         }
+    }
+
+    /**
+     * Accessor to get the user's primary role.
+     *
+     * @return string|null
+     */
+    public function getRoleAttribute(): ?string
+    {
+        return $this->roles->pluck('name')->first(); // Assuming a user has one primary role
+    }
+
+    /**
+     * Mutator to assign a role when setting the 'role' attribute.
+     *
+     * @param string $role
+     * @return void
+     */
+    public function setRoleAttribute(string $role): void
+    {
+        $this->syncRoles([$role]); // Replace existing roles with the new one
     }
 }

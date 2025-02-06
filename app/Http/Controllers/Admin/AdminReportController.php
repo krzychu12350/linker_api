@@ -28,13 +28,11 @@ class AdminReportController extends Controller
      */
     public function index(Request $request)
     {
-        $reports = Report::with(['user', 'files']) // Load associated user data
+        $reports = Report::with(['user', 'reportedUser', 'files']) // Load associated user data
         ->latest()                 // Order by latest reports
-        ->paginate(10);            // Paginate results
+        ->paginate($request->per_page ?? 10);            // Paginate results
 
-        return response()->json([
-            'data' => $reports,
-        ]);
+        return response()->json($reports);
     }
 
     /**
