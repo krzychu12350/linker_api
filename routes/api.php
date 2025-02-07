@@ -91,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/swipe-data', [SwipeController::class, 'show']);
 
         Route::apiResource('blocks', BlockController::class)->except([
+            'show',
             'update'
         ]);
 
@@ -158,6 +159,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
 
         Route::apiResource('events.votes', EventVoteController::class)->except([
+            'show',
             'update',
             'destroy',
         ]);
@@ -170,7 +172,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Endpoint for fetching reports with pagination
         Route::apiResource('/reports', AdminReportController::class)
-            ->except(['update'])
+            ->except([
+                'store',
+                'update'
+            ])
             ->names([
                 'index'   => 'admin.reports.index',    // GET /reports
                 'store'   => 'admin.reports.store',    // POST /reports
