@@ -18,15 +18,13 @@ class BlockController extends Controller
         $authUser = Auth::user();
 
         $blockedUsers =  $authUser->blockedUsers()
-            ->get()
-            ->map(function ($block) {
-                return [
-                    'id' => $block->id,
-                    'blocked_user' => [
-                        'id' => $block->blocked->id,
-                    ]
-                ];
-            });
+            ->get();
+//            ->map(function ($block) {
+//                return [
+//                    'id' => $block->id,
+//                    'blocked_user' => $block->blocked,
+//                ];
+//            });
 
 
         return response()->json(['blocks' => $blockedUsers]);
