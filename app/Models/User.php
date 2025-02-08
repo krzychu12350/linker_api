@@ -81,7 +81,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $appends = ['role'];
+    protected $appends = ['role', 'photo'];
 
     // Define the relationship to the images table (Many-to-Many)
     public function photos()
@@ -417,4 +417,15 @@ class User extends Authenticatable
     {
         $this->syncRoles([$role]); // Replace existing roles with the new one
     }
+
+    /**
+     * Accessor to get the user's primary photo URL.
+     *
+     * @return string|null
+     */
+    public function getPhotoAttribute(): ?string
+    {
+        return $this->photos->isEmpty() ? "" : $this->photos->first()->url;
+    }
+
 }

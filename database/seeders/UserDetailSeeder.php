@@ -26,6 +26,12 @@ class UserDetailSeeder extends Seeder
                 'culture' => ['Art', 'Theatre', 'Literature', 'Film', 'Travel'],
             ],
 
+//            DetailGroup::INTERESTS->value => [
+//             'Casual', 'Formal', 'Streetwear', 'Vintage',
+//             'Rock', 'Pop', 'Jazz', 'Classical', 'Hip-hop',
+//             'Art', 'Theatre', 'Literature', 'Film', 'Travel',
+//            ],
+
             // Groups without subgroups, just direct options
             DetailGroup::CHILDREN->value => ['Yes', 'No'],
             DetailGroup::RELATIONSHIP->value => ['Single', 'In a Relationship', 'Married', 'Divorced'],
@@ -34,12 +40,13 @@ class UserDetailSeeder extends Seeder
             DetailGroup::PERSONALITY_TYPE->value => ['INTJ', 'INFJ', 'ENTP', 'ENFP', 'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'],
             DetailGroup::SMOKING->value => ['I smoke', 'I do not smoke', 'I used to smoke', 'I want to quit'],
             DetailGroup::PETS->value => ['I have', "I'm going to have", "I don't have", 'I had'],
-            DetailGroup::RELIGION->value => [
-                'Christianity' => ['Catholic', 'Protestant', 'Orthodox'],
-                'Islam' => ['Sunni', 'Shia'],
-                'Hinduism' => ['Vaishnavism', 'Shaivism'],
-                'Buddhism' => ['Theravada', 'Mahayana'],
-            ],
+//            DetailGroup::RELIGION->value => [
+//                'Christianity' => ['Catholic', 'Protestant', 'Orthodox'],
+//                'Islam' => ['Sunni', 'Shia'],
+//                'Hinduism' => ['Vaishnavism', 'Shaivism'],
+//                'Buddhism' => ['Theravada', 'Mahayana'],
+//            ],
+            DetailGroup::RELIGION->value => ['Catholic', 'Protestant', 'Orthodox','Sunni', 'Shia', 'Vaishnavism', 'Shaivism','Theravada', 'Mahayana'],
             DetailGroup::EDUCATION_LEVEL->value => ['High School', 'Associate Degree', 'Bachelor’s Degree', 'Master’s Degree', 'Doctorate'],
         ];
 

@@ -117,6 +117,24 @@ class UserInterestService
         return $this->mapDetails($details, [], false);
     }
 
+    public function getAllUserDetailPreferencesWithSelection(User $user): array
+    {
+        $userDetailPreferences = $user
+            ->detailPreferences()
+            ->get();
+
+//        if($userDetails->isEmpty()) {
+//            return [];
+//        }
+
+        $selectedDetailsIds =  $userDetailPreferences
+            ->pluck('id')
+            ->toArray(); // Use pluck() to fetch only IDs
+
+        return $this->mapDetails($this->fetchDetails(), $selectedDetailsIds);
+    }
+
+
     public function getAllUserDetailsWithSelection(User $user): array
     {
         $userDetails = $user
@@ -250,4 +268,54 @@ class UserInterestService
 
         return true;
     }
+
+    /**
+     * Update the user detail preferences with the provided group and sub-group IDs.
+     *
+     * @param array $validatedData
+     * @param int $userId
+     * @return bool
+     */
+    public function updateUserDetailPreferences(array $validatedData, int $userId): bool
+    {
+        // Find the user
+        $user = User::find($userId);
+        if (!$user) {
+            return false;
+        }
+
+        $preferencesToUpdate = [];
+
+        // Collect all the sub-group details first for better performance
+        $subGroups = Detail::whereIn('id', array_column($validatedData['preferences'], 'sub_group_id'))
+            ->get()->keyBy('id');
+
+        $groupDetails = Detail::whereIn('id', array_column($validatedData['preferences'], 'group_id'))
+            ->get()->keyBy('id');
+
+        // Loop through the provided preferences
+        foreach ($validatedData['preferences'] as $preferenceData) {
+            $subGroupDetail = $preferenceData['sub_group_id'] ?? null;
+
+            // Check for valid sub-group detail if exists
+            if ($subGroupDetail && isset($subGroups[$subGroupDetail])) {
+                $groupDetail = $groupDetails[$preferenceData['group_id']] ?? null;
+
+                if ($groupDetail && $subGroups[$subGroupDetail]->parent_id == $groupDetail->id) {
+                    $preferencesToUpdate[] = $preferenceData['options'];
+                }
+            } else {
+                $preferencesToUpdate[] = $preferenceData['options'];
+            }
+        }
+
+        // Flatten and merge the options
+        $mergedPreferenceIds = collect($preferencesToUpdate)->flatten()->toArray();
+
+        // Sync the user with the selected preferences
+        $user->detailPreferences()->sync($mergedPreferenceIds);
+
+        return true;
+    }
+
 }

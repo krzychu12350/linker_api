@@ -9,6 +9,7 @@ use App\Http\Requests\User\Report\StoreReportRequest;
 use App\Models\File;
 use App\Models\Report;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
@@ -16,15 +17,15 @@ class ReportController extends Controller
     /**
      * Display a listing of the user's reports with their associated files.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
         // Fetch reports with related files using Eager Loading
         $reports = $user->reports()
-            ->with('files') // Eager load associated files
+            ->with('files', 'reportedUser') // Eager load associated files
             ->latest()      // Order by the most recent reports
-            ->paginate(10); // Paginate the results (10 per page)
+            ->paginate($request->per_page ?? 10); // Paginate the results (10 per page)
 
         return response()->json([
             'message' => 'Reports fetched successfully!',

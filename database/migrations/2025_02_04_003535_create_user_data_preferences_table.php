@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Reference to users table
             $table->integer('age_range_start')->nullable(); // Start of age range
             $table->integer('age_range_end')->nullable(); // End of age range
-            $table->integer('height')->nullable(); // User's height for this preference
+//            $table->integer('height')->nullable(); // User's height for this preference
             $table->timestamps();
         });
     }

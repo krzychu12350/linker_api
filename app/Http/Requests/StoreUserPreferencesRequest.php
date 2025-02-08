@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
-use App\Models\Detail; // Assuming you have a Detail model
+use Illuminate\Validation\Rule;
+use App\Models\Detail;
 
 class StoreUserPreferencesRequest extends FormRequest
 {
@@ -24,44 +24,60 @@ class StoreUserPreferencesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'details' => 'required|array',
-            'details.*' => 'exists:details,id',
+            'preferences' => 'required|array', // Ensure preferences is an array
+            'preferences.*.group_id' => 'required|exists:details,id', // Ensure group ID exists
+            'preferences.*.sub_group_id' => [
+                'nullable',
+                'exists:details,id',
+                function ($attribute, $value, $fail) {
+                    $index = $this->getIndex($attribute);
+                    $groupId = $this->input("preferences.{$index}.group_id");
+
+                    if ($value && $groupId) {
+                        $subGroup = Detail::find($value);
+
+                        if ($subGroup && $subGroup->parent_id !== $groupId) {
+                            $fail("The selected sub-group ID does not belong to the selected group.");
+                        }
+                    }
+                },
+            ],
+            'preferences.*.options' => 'required|array', // Ensure options are provided
+            'preferences.*.options.*' => 'exists:details,id', // Ensure each option ID is valid
             'age_range_start' => 'nullable|integer|min:1',
             'age_range_end' => 'nullable|integer|min:1|gte:age_range_start',
-            'height' => 'nullable|integer|min:1',
+           // 'height' => 'nullable|integer|min:1',
         ];
+    }
+
+    /**
+     * Get the index of the array element in 'preferences'
+     *
+     * @param string $attribute
+     * @return int
+     */
+    protected function getIndex(string $attribute): int
+    {
+        preg_match('/preferences\.(\d+)\./', $attribute, $matches);
+        return (int) $matches[1];
     }
 
     /**
      * Custom error messages.
      */
-    public function messages()
+    public function messages(): array
     {
         return [
-            'details.required' => 'You must select at least one preference.',
-            'details.*.exists' => 'Selected preference must be a valid detail.',
+            'preferences.required' => 'You must select at least one preference.',
+            'preferences.array' => 'Preferences must be an array.',
+            'preferences.*.group_id.required' => 'Group ID is required.',
+            'preferences.*.group_id.exists' => 'The selected group ID is invalid.',
+            'preferences.*.sub_group_id.exists' => 'The selected sub-group ID is invalid.',
+            'preferences.*.sub_group_id' => 'The sub-group ID must belong to the selected group.',
+            'preferences.*.options.required' => 'Options field is required.',
+            'preferences.*.options.array' => 'Options must be an array.',
+            'preferences.*.options.*.exists' => 'One or more selected options are invalid.',
             'age_range_end.gte' => 'Age range end must be greater than or equal to the start.',
         ];
-    }
-
-    /**
-     * Add custom validation after default validation.
-     */
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function ($validator) {
-            if ($this->has('details')) {
-                $details = $this->input('details');
-
-                $invalidDetails = Detail::whereIn('id', $details)
-                    ->whereNotNull('parent_id')
-                    ->pluck('id')
-                    ->toArray();
-
-                if (!empty($invalidDetails)) {
-                    $validator->errors()->add('details', 'Selected preferences cannot be associated with a parent.');
-                }
-            }
-        });
     }
 }

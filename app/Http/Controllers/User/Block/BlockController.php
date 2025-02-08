@@ -18,7 +18,8 @@ class BlockController extends Controller
         $authUser = Auth::user();
 
         $blockedUsers =  $authUser->blockedUsers()
-            ->get();
+            ->latest()
+            ->paginate($request->per_page ?? 10);
 //            ->map(function ($block) {
 //                return [
 //                    'id' => $block->id,
@@ -27,7 +28,7 @@ class BlockController extends Controller
 //            });
 
 
-        return response()->json(['blocks' => $blockedUsers]);
+        return response()->json($blockedUsers);
     }
 
     public function store(BlockUserRequest $request, User $user): JsonResponse

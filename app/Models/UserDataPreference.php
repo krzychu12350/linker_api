@@ -13,7 +13,7 @@ class UserDataPreference extends Model
     protected $fillable = [
         'age_range_start',
         'age_range_end',
-        'height',
+//        'height',
     ];
 
     // Relationship to User model
