@@ -42,6 +42,7 @@ class MatchedSwipeResource extends JsonResource
             'id' => $this->id,
             'user_id' => $secondUser->id,
             'conversation_id' => $conversation->id,
+            'last_message' => $conversation->messages()->latest()?->first()?->body,
             'first_name' => $secondUser->first_name,
             'last_name' => $secondUser->last_name,
             'age' => $secondUser->age,

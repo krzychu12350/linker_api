@@ -117,6 +117,7 @@ class GroupConversationMessageController extends Controller
                 'author' => [
                     'id' => $message->sender->id,
                     'first_name' => $message->sender->first_name,
+                    'photo' => $message->sender->photo,
                 ],
                 'files' => FileResource::collection($message->files)
             ]

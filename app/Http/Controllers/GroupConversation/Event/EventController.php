@@ -31,6 +31,7 @@ class EventController extends Controller
         $events = $events->map(function ($event) {
             // Fetch the grouped votes for the event using the votes() method in the Event model
             $event->votes = $event->votes();
+            $event->user = $event->user->get();
             return $event;
         });
 
