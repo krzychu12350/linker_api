@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\GroupConversation\Event\Vote;
 
+use App\Enums\PollResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GroupConversation\Event\StoreEventVoteRequest;
 use App\Http\Resources\GroupConversation\Event\Vote\EventVoteResource;
@@ -25,6 +26,7 @@ class EventVoteController extends Controller
     // Store or update a user's vote on an event
     public function store(StoreEventVoteRequest $request, Conversation $group, Event $event)
     {
+
         // Validate the response using the StoreEventVoteRequest validation rules
         $validatedData = $request->validated();
 

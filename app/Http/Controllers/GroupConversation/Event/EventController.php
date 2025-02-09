@@ -6,9 +6,12 @@ use App\Enums\NotificationType;
 use App\Helpers\Pusher;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GroupConversation\Event\StoreEventRequest;
+use App\Http\Requests\GroupConversation\Event\UpdateEventRequest;
 use App\Models\Conversation;
 use App\Models\Event;
 use App\Services\NotificationService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -20,7 +23,7 @@ class EventController extends Controller
      * Get a list of events for a particular conversation.
      *
      * @param \App\Models\Conversation $group
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index(Conversation $group)
     {
@@ -61,4 +64,53 @@ class EventController extends Controller
         return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
     }
 
+    /**
+     * Update an existing event.
+     */
+    public function update(UpdateEventRequest $request, Conversation $group, Event $event): JsonResponse
+    {
+        $user = Auth::user();
+
+        // Ensure the user is authorized to update the event
+        if ($event->user_id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Update the event with validated data
+        $event->update($request->validated());
+
+        // Send a notification about the update
+        $this->notificationService->addNotification(
+            $user,
+            'Event "' . $event->title . '" has been updated.'
+        );
+
+        return response()->json(['message' => 'Event updated successfully', 'event' => $event]);
+    }
+
+
+    /**
+     * Delete an event and its associated votes.
+     *
+     * @param \App\Models\Conversation $group
+     * @param \App\Models\Event $event
+     * @return JsonResponse
+     */
+    public function destroy(Conversation $group, Event $event): JsonResponse
+    {
+        $user = Auth::user();
+        // Delete associated votes first
+        $event->polls()->delete();
+
+        // Delete the event itself
+        $event->delete();
+
+        // Send a notification or response after deletion (if needed)
+        $this->notificationService->addNotification(
+            $user, // Assuming you want to notify the group user about the event deletion
+            'Event "' . $event->title . '" has been deleted.'
+        );
+
+        return response()->json([], 204);
+    }
 }

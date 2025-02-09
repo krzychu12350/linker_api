@@ -153,10 +153,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/name', [GroupConversationController::class, 'updateName']);
         Route::patch('/admin', [GroupConversationController::class, 'updateAdmin']);
 
-        Route::apiResource('events', EventController::class)->except([
-            'update',
-            'destroy',
-        ]);
+        Route::apiResource('events', EventController::class);
 
         Route::apiResource('events.votes', EventVoteController::class)->except([
             'show',
