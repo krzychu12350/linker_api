@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Profile\ProfileResource;
+use App\Http\Resources\User\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,13 +22,10 @@ class SwipeResource extends JsonResource
 
 
         return [
-            'user' => [
-                'swipe_id' => $this->resource->id,
-                'first_name' => $this->resource->first_name,
-                'age' => $this->resource->age,
-                'photo' =>  $photoUrl,  // Cloudinary URL or empty string
-                'photos' => PhotoResource::collection($this->resource->photos),
-            ],
+
+                'user' => new SwipeUserResource($this->resource),
+
+
 
             // 'details' => $this->resource->allSelectedDetails(),
         ];

@@ -38,9 +38,12 @@ class SwipeController extends Controller
         // Use the builder pattern to filter users
         $users = $this->swipeFilterService
             ->initialize($user)                // Initialize the query with the base conditions
-            ->filterByPreferenceData($user)     // Filter by preference data (age, height)
-            ->filterByDetailPreferences($user) // Filter by detail preferences
+//            ->filterByPreferenceData($user)     // Filter by preference data (age, height)
+//            ->filterByDetailPreferences($user) // Filter by detail preferences
             ->excludeMatchedUsers($user)       // Exclude already matched users
+            ->excludeAlreadySwipedUsers($user)
+            ->excludeUsersWithRoles(['admin', 'moderator']) // Exclude users with 'admin' and 'moderator' roles
+            ->excludeUsersWithoutDetails()
             ->get();                           // Get the final filtered users
 
         return SwipeResource::collection($users);

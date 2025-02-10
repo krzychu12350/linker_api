@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Swipe;
 use App\Models\SwipeMatch;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -93,6 +94,51 @@ class SwipeFilterService
 
         return $this;
     }
+
+    public function excludeAlreadySwipedUsers(User $user): self
+    {
+        $swipedUserIds = Swipe::where('user_id', $user->id)
+            ->pluck('swiped_user_id')
+            ->toArray();
+
+        $this->query->whereNotIn('id', $swipedUserIds);
+
+        return $this;
+    }
+
+
+    /**
+     * Exclude users with specific roles.
+     *
+     * @param array $roles
+     * @return $this
+     */
+    public function excludeUsersWithRoles(array $roles): self
+    {
+        // Exclude users who have any of the specified roles
+        $this->query->whereDoesntHave('roles', function ($query) use ($roles) {
+            $query->whereIn('name', $roles); // 'name' is the default column for role names in Spatie's permission package
+        });
+
+        return $this;
+    }
+
+    /**
+     * Exclude users who do not have any details.
+     *
+     * @return $this
+     */
+    public function excludeUsersWithoutDetails(): self
+    {
+        // Exclude users who don't have any details (empty details relationship)
+        $this->query->whereHas('details', function ($query) {
+            // Ensure there is at least one related detail
+            $query->whereNotNull('detail_id'); // Ensure the pivot table has valid detail_id
+        });
+
+        return $this;
+    }
+
 
     /**
      * Get the final filtered users.

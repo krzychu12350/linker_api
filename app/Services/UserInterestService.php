@@ -127,7 +127,7 @@ class UserInterestService
 //            return [];
 //        }
 
-        $selectedDetailsIds =  $userDetailPreferences
+        $selectedDetailsIds = $userDetailPreferences
             ->pluck('id')
             ->toArray(); // Use pluck() to fetch only IDs
 
@@ -213,6 +213,48 @@ class UserInterestService
         return $selectedOptions;
     }
 
+    public function getFlattenedOptionsForGroupsWithSubGroups(User $user): array
+    {
+        $data = $this->getAllUserDetailsWithSelection($user);
+
+        $flattenedOptions = [];
+
+        foreach ($data as $group) {
+            $flattenedGroup = [
+                'id' => $group['id'],
+                'group' => $group['group'],
+                'options' => []
+            ];
+
+            if (isset($group['subGroups']) && !empty($group['subGroups'])) {
+                foreach ($group['subGroups'] as $subGroup) {
+                    foreach ($subGroup['options'] as $option) {
+                        if (!empty($option['is_selected'])) {
+                            $flattenedGroup['options'][] = [
+                                'id' => $option['id'],
+                                'name' => $option['name']
+                            ];
+                        }
+                    }
+                }
+            } else if (isset($group['options'])) {
+                foreach ($group['options'] as $option) {
+                    if (!empty($option['is_selected'])) {
+                        $flattenedGroup['options'][] = [
+                            'id' => $option['id'],
+                            'name' => $option['name']
+                        ];
+                    }
+                }
+            }
+
+            if (!empty($flattenedGroup['options'])) {
+                $flattenedOptions[] = $flattenedGroup;
+            }
+        }
+
+        return $flattenedOptions;
+    }
 
 
 
