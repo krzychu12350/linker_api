@@ -48,7 +48,7 @@ class PasswordResetController extends Controller
         );
 
         // Send reset email (You need to configure your email system)
-        Mail::to($user->email)->send(new PasswordResetEmail($token, $user->email));
+        Mail::to($user->email)->send(new PasswordResetEmail($token, $user));
 
         // For now, we'll simulate email sending
         return response()->json([
