@@ -85,38 +85,38 @@ class AuthController extends Controller
 
         $this->setStrategy($credentials);
 
-        // Use the findByEmail method to find the user
-        $user = User::findByEmail($credentials['email']);
-
-        if ($user) {
-            // Check if the user is banned
-            $banType = $user->banType();
-
-            // If the user is banned, return a 403 response
-            if ($banType === BanType::PERMANENT) {
-                return response()->json(
-                    [
-                        'message' => 'Your account is permanently banned.',
-                        'data' => [
-                            'ban_type' => $banType,
-                        ]
-                    ],
-                    403);
-            }
-
-            if ($banType === BanType::TEMPORARY) {
-                return response()->json([
-                    'message' => 'Your account is temporarily banned.',
-                    'data' => [
-                        'ban_type' => $banType,
-                        'banned_until' => $user->banned_until
-                    ]
-                ], 403);
-            }
-        }
-
         try {
             $result = $this->authStrategy->login($credentials);
+            // Use the findByEmail method to find the user
+            $user = $result['user'];
+
+            if ($user) {
+                // Check if the user is banned
+                $banType = $user->banType();
+
+                // If the user is banned, return a 403 response
+                if ($banType === BanType::PERMANENT) {
+                    return response()->json(
+                        [
+                            'message' => 'Your account is permanently banned.',
+                            'data' => [
+                                'ban_type' => $banType,
+                            ]
+                        ],
+                        403);
+                }
+
+                if ($banType === BanType::TEMPORARY) {
+                    return response()->json([
+                        'message' => 'Your account is temporarily banned until ' . $user->banned_until . '.',
+                        'data' => [
+                            'ban_type' => $banType,
+                            'banned_until' => $user->banned_until
+                        ]
+                    ], 403);
+                }
+            }
+
             return response()->json($result, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);

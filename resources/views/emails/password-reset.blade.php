@@ -10,7 +10,8 @@
 <p>Hello,</p>
 <p>You are receiving this email because we received a password reset request for your account.</p>
 <p>Click the link below to reset your password:</p>
-<p><a href="{{ url('/reset-password/'.$token) }}">Reset Password</a></p>
+{{--<p><a href="{{ url('/reset-password/'.$token) }}">Reset Password</a></p>--}}
+<p><a href="{{ 'http://localhost:5173/?token='.$token }}">Reset Password</a></p>
 <p>If you did not request a password reset, no further action is required.</p>
 <p>Regards,</p>
 <p>Your Company</p>

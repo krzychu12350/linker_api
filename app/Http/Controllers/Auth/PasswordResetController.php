@@ -30,6 +30,14 @@ class PasswordResetController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        // Check if the user has any linked social accounts
+        if ($user->linkedSocialAccounts()->count() > 0) {
+            // If the user has linked social accounts, they cannot reset their password
+            return response()->json([
+                'error' => 'Users who signed up with social accounts cannot reset their password.',
+            ], 400);
+        }
+
         // Generate a reset token
         $token = Str::random(60);
 

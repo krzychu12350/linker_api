@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Auth\AuthController;
@@ -166,6 +167,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // ROLE ADMIN/MODERATOR
     Route::middleware(['auth:sanctum', 'admin'])->prefix('/admin')->group(function () {
         //Reports management
+        //Dashboard
+        Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
         // Endpoint for fetching reports with pagination
         Route::apiResource('/reports', AdminReportController::class)

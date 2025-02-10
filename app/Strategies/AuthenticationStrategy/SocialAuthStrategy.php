@@ -2,6 +2,8 @@
 
 namespace App\Strategies\AuthenticationStrategy;
 
+use App\Enums\FileType;
+use App\Models\File;
 use App\Models\User;
 use App\Models\LinkedSocialAccount;
 use Illuminate\Support\Str;
@@ -53,12 +55,14 @@ class SocialAuthStrategy implements AuthStrategy
 
             // Get the user information from the provider using the access token
             $providerUser = Socialite::driver($provider)->userFromToken($accessToken);
+
         } catch (\Exception $exception) {
             throw new \Exception('Social login failed: ' . $exception->getMessage());
         }
 
         // Find or create user based on the social account info
         $user = $this->findOrCreate($providerUser, $provider);
+
 
         // Return the user's details and an authentication token
         return [
@@ -93,6 +97,15 @@ class SocialAuthStrategy implements AuthStrategy
                 'email' => $providerUser->getEmail(),
                 'password' => bcrypt(Str::random(16)),  // Generate a random password for the user
             ]);
+
+            $user->assignRole('user'); // Default role as USER
+
+            $file = File::create([
+                'url' => $providerUser->getAvatar(),
+                'type' => FileType::IMAGE,
+            ]);
+
+            $user->photos()->attach($file);
 
             // Mark the email as verified (you can modify this depending on your email verification logic)
             $user->markEmailAsVerified();
