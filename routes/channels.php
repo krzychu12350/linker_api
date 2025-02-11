@@ -32,3 +32,11 @@ Broadcast::channel('notifications.user.{user_id}', function ($user, $userId) {
     return true;
 });
 
+Broadcast::channel('matches.user.{user_id}', function ($user, $userId) {
+    return true;
+});
+
+Broadcast::channel('notifications.user.{user_id}', function ($user, $userId) {
+    return true;
+});
+

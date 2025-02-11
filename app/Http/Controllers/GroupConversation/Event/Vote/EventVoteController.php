@@ -9,10 +9,16 @@ use App\Http\Resources\GroupConversation\Event\Vote\EventVoteResource;
 use App\Models\Conversation;
 use App\Models\Event;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 
 class EventVoteController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
+
     // Get all votes for a specific event
     public function index(Conversation $group, Event $event)
     {
@@ -45,6 +51,9 @@ class EventVoteController extends Controller
             $existingVote->update([
                 'response' => $validatedData['response'],
             ]);
+
+            $this->broadcastNotifications($group, $event);
+
             return response()->json(['message' => 'Vote updated successfully', 'vote' => $existingVote], 200);
         } else {
             // Otherwise, create a new vote
@@ -52,8 +61,25 @@ class EventVoteController extends Controller
                 'user_id' => $user->id,
                 'response' => $validatedData['response'],
             ]);
+
+            $this->broadcastNotifications($group, $event);
+
             return response()->json(['message' => 'Vote recorded successfully', 'vote' => $vote], 201);
         }
+    }
+
+    private function broadcastNotifications(Conversation $group, Event $event): void
+    {
+        $groupMembers = $group->users()->get();
+
+        foreach ($groupMembers as $groupMember) {
+            $this->notificationService->addNotification(
+                $groupMember,
+                'User ' . $event->user->first_name . ' ' . $event->user->last_name . ' has voted on ' . $event->title . ' event.'
+            );
+        }
+
+
     }
 
 }

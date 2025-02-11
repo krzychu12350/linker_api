@@ -22,6 +22,7 @@ use App\Http\Controllers\User\Block\BlockController;
 use App\Http\Controllers\User\Conversation\ConversationController;
 use App\Http\Controllers\User\Conversation\UserGroupConversationController;
 use App\Http\Controllers\User\Detail\UserDetailController;
+use App\Http\Controllers\User\Notification\NotificationController;
 use App\Http\Controllers\User\Photo\UserProfilePhotoController;
 use App\Http\Controllers\User\Preference\PreferenceController;
 use App\Http\Controllers\User\Profile\UserProfileController;
@@ -114,6 +115,12 @@ Route::middleware('auth:sanctum')->group(function () {
             'store'
         ]);
 
+        Route::apiResource('notifications', NotificationController::class)->only([
+            'index',
+            'update',
+            'destroy'
+        ]);
+
     });
 
     Route::get('/matches', [MatchController::class, 'index']);
@@ -123,6 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('details', DetailController::class)->only([
         'index',
     ]);
+
 
     Route::apiResource('users.details', UserDetailController::class)->only([
         'index',

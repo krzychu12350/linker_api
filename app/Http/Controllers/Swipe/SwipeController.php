@@ -13,6 +13,7 @@ use App\Models\ConversationUser;
 use App\Models\Swipe;
 use App\Models\SwipeMatch;
 use App\Models\User;
+use App\Services\MatcherNotifier;
 use App\Services\SwipeFilterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -24,6 +25,7 @@ class SwipeController extends Controller
     public function __construct(
         private readonly UserInterestService $userInterestService,
         private readonly SwipeFilterService  $swipeFilterService,
+        private readonly MatcherNotifier $matcherNotifier,
     )
     {
     }
@@ -38,8 +40,8 @@ class SwipeController extends Controller
         // Use the builder pattern to filter users
         $users = $this->swipeFilterService
             ->initialize($user)                // Initialize the query with the base conditions
-//            ->filterByPreferenceData($user)     // Filter by preference data (age, height)
-//            ->filterByDetailPreferences($user) // Filter by detail preferences
+            ->filterByPreferenceData($user)     // Filter by preference data (age, height)
+            ->filterByDetailPreferences($user) // Filter by detail preferences
             ->excludeMatchedUsers($user)       // Exclude already matched users
             ->excludeAlreadySwipedUsers($user)
             ->excludeUsersWithRoles(['admin', 'moderator']) // Exclude users with 'admin' and 'moderator' roles
@@ -97,12 +99,12 @@ class SwipeController extends Controller
                 ->where('swipe_id_2', $validated['user_id']);
         })->first();
 
-        if ($existingMatch) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'A match with this user already exists.'
-            ], 400);
-        }
+//        if ($existingMatch) {
+//            return response()->json([
+//                'status' => 'error',
+//                'message' => 'A match with this user already exists.'
+//            ], 400);
+//        }
 
         // Check if the swipe already exists
         $swipe = Swipe::firstOrCreate(
@@ -147,6 +149,11 @@ class SwipeController extends Controller
                 'user_id' => $validated['swiped_user_id'],
                 'is_admin' => false, // By default, the user is not an admin
             ]);
+
+            $this->matcherNotifier->notify(
+                User::find($validated['user_id']),
+                User::find($validated['swiped_user_id'])
+            );
 
             // Return success response with matched users
             return response()->json([

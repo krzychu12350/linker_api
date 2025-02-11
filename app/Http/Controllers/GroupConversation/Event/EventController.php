@@ -55,11 +55,16 @@ class EventController extends Controller
     {
         $event = $group->events()->create($request->validated());
 
-        /// dd($event->user);
-        $this->notificationService->addNotification(
-            $event->user,
-            'User ' . $event->user->first_name . ' ' . $event->user->last_name . ' added event: ' . $event->title
-        );
+        //dd($group->users()->get());
+        $groupMembers = $group->users()->get();
+        foreach ($groupMembers as $groupMember) {
+
+            $this->notificationService->addNotification(
+                $groupMember,
+                'User ' . $event->user->first_name . ' ' . $event->user->last_name . ' added event: ' . $event->title
+            );
+        }
+
 
         return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
     }
