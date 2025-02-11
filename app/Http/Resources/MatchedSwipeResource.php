@@ -9,7 +9,6 @@ use function PHPUnit\Framework\isEmpty;
 
 class MatchedSwipeResource extends JsonResource
 {
-
     /**
      * Transform the resource into an array.
      *
@@ -17,41 +16,34 @@ class MatchedSwipeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
-
-        // Assuming $photoUrl is something like "storage/filename.jpg"
-//        $photoUrl = $this->resource->photos->isEmpty() ? "" : cloudinary()->getUrl(
-//            $this->resource->photos->first()->url
-//        );
-        // dd($this->resource->conversation->users->first());
-
+        // Get the second user from the conversation
         $secondUser = $this->resource->conversation->users->first();
+
+        // If secondUser is null, return a default value or empty string for the photo URL
+        if (!$secondUser) {
+            $photoUrl = ""; // Default value if secondUser is null
+        } else {
+            // If secondUser exists, get the photos
+            $secondUserPhotos = $secondUser->photos;
+
+            // Build the photo URL (using Cloudinary or empty string if no photos exist)
+            $photoUrl = $secondUserPhotos->isEmpty()
+                ? ""
+                : $secondUserPhotos->first()->url;
+        }
+
+        // Get the conversation
         $conversation = $this->resource->conversation;
-        $secondUserPhotos = $secondUser->photos;
 
-        // Build the photo URL (using Cloudinary or empty string if no photos exist)
-        $photoUrl = $secondUserPhotos->isEmpty()
-            ? ""
-            :
-//            "https://res.cloudinary.com/dm4zof0l0/image/upload/v1734207746/" .
-            $secondUserPhotos->first()->url;
-
-//        dd($this->resource);
         return [
-//            'user' => [
             'id' => $this->id,
-            'user_id' => $secondUser->id,
+            'user_id' => $secondUser->id ?? null,  // Make sure to handle null user
             'conversation_id' => $conversation->id,
             'last_message' => $conversation->messages()->latest()?->first()?->body,
-            'first_name' => $secondUser->first_name,
-            'last_name' => $secondUser->last_name,
-            'age' => $secondUser->age,
+            'first_name' => $secondUser->first_name ?? '',
+            'last_name' => $secondUser->last_name ?? '',
+            'age' => $secondUser->age ?? null,
             'major_photo' => $photoUrl,  // Cloudinary URL or empty string
-            //'photos' => PhotoResource::collection($this->resource->photos),
-//            ],
-//            'photos' => PhotoResource::collection($this->resource->photos),
-            // 'details' => $this->resource->allSelectedDetails(),
         ];
-
     }
 }
