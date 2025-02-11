@@ -6,10 +6,17 @@ use App\Enums\ConversationType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GroupConversation\User\GroupConversationUserRequest;
 use App\Models\Conversation;
+use App\Models\Event;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 
 class GroupConversationUserController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Add multiple users to a specific group conversation.
      */
@@ -39,6 +46,15 @@ class GroupConversationUserController extends Controller
 
         // Add the new users to the conversation
         $group->users()->attach($newUserIds);
+
+
+        foreach ($newUserIds as $userId) {
+            $user = User::find($userId);
+            $this->notificationService->addNotification(
+                $user,
+                'User ' . $user->first_name . ' ' . $user->last_name . ' has been added to ' . $group->name . '.'
+            );
+        }
 
         return response()->json([
             'status' => 'success',
@@ -96,10 +112,19 @@ class GroupConversationUserController extends Controller
         // Remove the users from the conversation
         $group->users()->detach($removableUserIds);
 
+        foreach ($removableUserIds as $userId) {
+            $user = User::find($userId);
+            $this->notificationService->addNotification(
+                $user,
+                'User ' . $user->first_name . ' ' . $user->last_name . ' has been removed from ' . $group->name . '.'
+            );
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'Users removed from the conversation, and admin privilege assigned if necessary.',
         ], 200);
     }
+
 
 }
