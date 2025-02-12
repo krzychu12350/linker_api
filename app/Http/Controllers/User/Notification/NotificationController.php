@@ -20,7 +20,7 @@ class NotificationController extends Controller
     public function index(Request $request, User $user)
     {
         $user = Auth::user();
-        $notifications = $user->notifications()->get();
+        $notifications = $user->notifications()->latest('id')->get();
 
         $notifications->transform(function ($notification) {
             $notification->time_ago = Carbon::parse($notification->created_at)->diffForHumans();

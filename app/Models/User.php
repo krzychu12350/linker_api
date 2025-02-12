@@ -428,4 +428,11 @@ class User extends Authenticatable
         return $this->photos->isEmpty() ? "" : $this->photos->first()->url;
     }
 
+    // Define whereRoles scope
+    public function scopeWhereRoles($query, array $roles)
+    {
+        return $query->whereHas('roles', function ($q) use ($roles) {
+            $q->whereIn('name', $roles);
+        });
+    }
 }

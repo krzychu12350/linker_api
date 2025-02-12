@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\BanType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\User\BanUserRequest;
 use App\Http\Requests\Admin\User\StoreModeratorRequest;
 use App\Http\Requests\Admin\User\UpdateModeratorRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -18,7 +21,7 @@ class AdminUserController extends Controller
      */
     public function index(Request $request)
     {
-        $moderators = User::role('moderator')->paginate($request->per_page ?? 10);
+        $moderators = User::role('moderator')->latest('id')->paginate($request->per_page ?? 10);
         return response()->json($moderators);
     }
 
@@ -86,19 +89,36 @@ class AdminUserController extends Controller
     /**
      * Ban a moderator.
      */
-    public function ban(User $user, Request $request)
+    public function ban(BanUserRequest $request, User $user)
     {
-        if (!$user->hasRole('moderator')) {
-            return response()->json(['message' => 'User is not a moderator.'], 404);
+        $authUser = Auth::user();
+
+        if (!$authUser->hasRole('admin')) {
+            return response()->json(['message' => 'User is not a admin.'], 403);
         }
 
-        $request->validate([
-            'banned_until' => 'required|date|after:today',
-        ]);
+        $validated = $request->validated();
 
-        $user->is_banned = true;
-        $user->banned_until = $request->banned_until;
-        $user->save();
+        // Check if the user is already banned
+        if ($user->is_banned) {
+            return response()->json([
+                'message' => 'The user is already banned and cannot be banned again.'
+            ], 400); // 400 Bad Request
+        }
+
+        if ($validated['ban_type'] === BanType::TEMPORARY->value) {
+            $user->update([
+                'is_banned' => true,
+                'banned_until' => $validated['banned_until']
+            ]);
+        } else {
+            // Permanent ban
+            $user->update([
+                'is_banned' => true,
+                'banned_until' => null
+            ]);
+        }
+
 
         return response()->json(['message' => 'Moderator banned successfully.']);
     }
@@ -108,8 +128,10 @@ class AdminUserController extends Controller
      */
     public function unban(User $user)
     {
-        if (!$user->hasRole('moderator')) {
-            return response()->json(['message' => 'User is not a moderator.'], 404);
+        $authUser = Auth::user();
+
+        if (!$authUser->hasRole('admin')) {
+            return response()->json(['message' => 'User is not a admin.'], 403);
         }
 
         $user->is_banned = false;

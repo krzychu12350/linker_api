@@ -65,11 +65,12 @@ class SwipeFilterService
      */
     public function filterByDetailPreferences(User $user): self
     {
-        if($user->detailPreferences->isNotEmpty()) {
-            $this->query->whereHas('detailPreferences', function ($query) use ($user) {
+        $this->query->when($user->detailPreferences->isNotEmpty(), function ($query) use ($user) {
+            $query->whereHas('detailPreferences', function ($query) use ($user) {
                 $query->whereIn('detail_id', $user->detailPreferences->pluck('id'));
             });
-        }
+        });
+
 
         return $this;
     }

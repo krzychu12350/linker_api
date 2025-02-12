@@ -41,7 +41,7 @@ class SwipeController extends Controller
         $users = $this->swipeFilterService
             ->initialize($user)                // Initialize the query with the base conditions
             ->filterByPreferenceData($user)     // Filter by preference data (age, height)
-            ->filterByDetailPreferences($user) // Filter by detail preferences
+           // ->filterByDetailPreferences($user) // Filter by detail preferences
             ->excludeMatchedUsers($user)       // Exclude already matched users
             ->excludeAlreadySwipedUsers($user)
             ->excludeUsersWithRoles(['admin', 'moderator']) // Exclude users with 'admin' and 'moderator' roles
@@ -99,12 +99,12 @@ class SwipeController extends Controller
                 ->where('swipe_id_2', $validated['user_id']);
         })->first();
 
-//        if ($existingMatch) {
-//            return response()->json([
-//                'status' => 'error',
-//                'message' => 'A match with this user already exists.'
-//            ], 400);
-//        }
+        if ($existingMatch) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'A match with this user already exists.'
+            ], 400);
+        }
 
         // Check if the swipe already exists
         $swipe = Swipe::firstOrCreate(
@@ -236,8 +236,15 @@ class SwipeController extends Controller
         // Get the authenticated user
         $user = auth()->user();
 
-        // Retrieve all swipeMatches where the current user's ID is swipe_id_1 or swipe_id_2
-        $swipes = $user->swipeMatches();
+        // Retrieve all blocked user IDs
+        $blockedUserIds = $user->blockedUsers()->pluck('blocked_id')->toArray();
+
+        // Retrieve matched swipes and filter out blocked users
+        $swipes = $user->swipeMatches()->reject(function ($swipe) use ($blockedUserIds) {
+            return in_array($swipe->swipe_id_1, $blockedUserIds) || in_array($swipe->swipe_id_2, $blockedUserIds);
+        });
+
+      //  dd( $swipes);
        // dd($swipes->toArray());
 //        $swipes = SwipeMatch::all();
 //        //dd(  SwipeMatch::all()->toArray());

@@ -9,11 +9,16 @@ use App\Http\Requests\User\Report\StoreReportRequest;
 use App\Models\File;
 use App\Models\Report;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Display a listing of the user's reports with their associated files.
      */
@@ -73,6 +78,15 @@ class ReportController extends Controller
 
             // Associate the uploaded files with the created report
             $report->files()->attach($fileIds);
+        }
+
+        $users = User::whereRoles(['moderator', 'admin'])->get();
+
+        foreach ($users as $user) {
+            $this->notificationService->addNotification(
+                $user,
+                'User ' . $user->first_name . ' ' . $user->last_name . ' added a new report.'
+            );
         }
 
         return response()->json([

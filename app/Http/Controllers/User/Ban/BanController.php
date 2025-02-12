@@ -14,19 +14,18 @@ class BanController extends Controller
 {
     public function banUser(BanUserRequest $request, User $user)
     {
+        $validated = $request->validated();
         // Check if the user is already banned
-//        if ($user->is_banned) {
-//            return response()->json([
-//                'message' => 'The user is already banned and cannot be banned again.'
-//            ], 400); // 400 Bad Request
-//        }
+        if ($user->is_banned) {
+            return response()->json([
+                'message' => 'The user is already banned and cannot be banned again.'
+            ], 400); // 400 Bad Request
+        }
 
-        if ($request->ban_type === BanType::TEMPORARY->value) {
-            // Calculate the duration for a temporary ban
-            //$banUntil = Carbon::now()->addDays($request->duration);
+        if ($validated['ban_type'] === BanType::TEMPORARY->value) {
             $user->update([
                 'is_banned' => true,
-                'banned_until' => $request->duration
+                'banned_until' => $validated['duration']
             ]);
         } else {
             // Permanent ban
@@ -54,7 +53,6 @@ class BanController extends Controller
 
         return response()->json([
             'message' => 'User unbanned successfully.',
-            'user' => $user
         ]);
     }
 }
