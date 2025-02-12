@@ -25,7 +25,7 @@ class SwipeController extends Controller
     public function __construct(
         private readonly UserInterestService $userInterestService,
         private readonly SwipeFilterService  $swipeFilterService,
-        private readonly MatcherNotifier $matcherNotifier,
+        private readonly MatcherNotifier     $matcherNotifier,
     )
     {
     }
@@ -41,7 +41,7 @@ class SwipeController extends Controller
         $users = $this->swipeFilterService
             ->initialize($user)                // Initialize the query with the base conditions
             ->filterByPreferenceData($user)     // Filter by preference data (age, height)
-           // ->filterByDetailPreferences($user) // Filter by detail preferences
+            ->filterByDetailPreferences($user) // Filter by detail preferences
             ->excludeMatchedUsers($user)       // Exclude already matched users
             ->excludeAlreadySwipedUsers($user)
             ->excludeUsersWithRoles(['admin', 'moderator']) // Exclude users with 'admin' and 'moderator' roles
@@ -49,6 +49,13 @@ class SwipeController extends Controller
             ->get();                           // Get the final filtered users
 
         return SwipeResource::collection($users);
+
+
+
+
+
+
+
 
         //old
 //        $user = auth()->user();
@@ -180,7 +187,7 @@ class SwipeController extends Controller
     {
         // dd($user->toArray());
 
-           // dd( $this->userInterestService->getUserSelectedOptionForEachGroup($user));
+        // dd( $this->userInterestService->getUserSelectedOptionForEachGroup($user));
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -244,8 +251,8 @@ class SwipeController extends Controller
             return in_array($swipe->swipe_id_1, $blockedUserIds) || in_array($swipe->swipe_id_2, $blockedUserIds);
         });
 
-      //  dd( $swipes);
-       // dd($swipes->toArray());
+        //  dd( $swipes);
+        // dd($swipes->toArray());
 //        $swipes = SwipeMatch::all();
 //        //dd(  SwipeMatch::all()->toArray());
 //        // Initialize an array to store matched users where swipe_id_2 matches
@@ -271,6 +278,6 @@ class SwipeController extends Controller
 //        }
 
         // Return matched users with the specified relationships
-        return MatchedSwipeResource::collection( $swipes);
+        return MatchedSwipeResource::collection($swipes);
     }
 }
